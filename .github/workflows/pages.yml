@@ -1,0 +1,62 @@
+name: Deploy digest to GitHub Pages
+
+# Publishes index.html at the repository root to GitHub Pages.
+#
+# The `enablement: true` option below lets this workflow turn Pages on by
+# itself, using the workflow's own GITHUB_TOKEN. That avoids needing a
+# personal access token with the Pages permission.
+#
+# Requirements before this can succeed:
+#   1. Settings > Pages > Source must be set to "GitHub Actions"
+#      (or left unset, in which case `enablement: true` configures it).
+#   2. Pages from a PRIVATE repository requires GitHub Pro or higher.
+#      On GitHub Free the repository must be public.
+#
+# Note: a Pages site is served publicly on the internet even when the
+# repository is private, unless the repo belongs to an organisation on
+# GitHub Enterprise Cloud with private Pages configured.
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'index.html'
+      - '.github/workflows/pages.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+# Allow one concurrent deployment, and let a running one finish rather than
+# cancelling it midway through publishing.
+concurrency:
+  group: pages
+  cancel-in-progress: false
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - name: Check out the repository
+        uses: actions/checkout@v4
+
+      - name: Configure Pages (enabling it if necessary)
+        uses: actions/configure-pages@v5
+        with:
+          enablement: true
+
+      - name: Upload the site
+        uses: actions/upload-pages-artifact@v3
+        with:
+          # The digest is a single self-contained file at the repository
+          # root. The action excludes .git and .github automatically.
+          path: .
+
+      - name: Deploy to Pages
+        id: deployment
+        uses: actions/deploy-pages@v4
