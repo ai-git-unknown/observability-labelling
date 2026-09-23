@@ -78,6 +78,13 @@
   }
   .chip:hover{border-color:var(--dim); color:var(--text)}
   .chip.on{background:var(--orange); border-color:var(--orange); color:#141414; font-weight:600}
+  /* A CSS-drawn dot instead of a warning glyph, so the cue never depends
+     on the font shipping an emoji or dingbat. */
+  .chip[data-f="must"]::before{
+    content:""; display:inline-block; width:7px; height:7px; border-radius:50%;
+    background:var(--red); margin-right:7px; vertical-align:1px;
+  }
+  .chip[data-f="must"].on::before{background:#141414}
   .count{color:var(--dim); font-size:12.5px; margin-left:auto; white-space:nowrap}
 
   /* ---------- cards ---------- */
@@ -119,6 +126,20 @@
     background:var(--card2); border:1px solid var(--line); border-radius:4px;
     padding:1px 5px; font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace; font-size:12px; color:#ffb094;
   }
+  /* ---------- example block ---------- */
+  pre.ex{
+    margin:0; background:#0d0f12; border:1px solid var(--line); border-left:3px solid var(--blue);
+    border-radius:8px; padding:10px 12px; overflow-x:auto;
+    font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;
+    font-size:11.8px; line-height:1.62; color:#c6cdd8; white-space:pre;
+  }
+  /* Spans stay inline and line breaks come from real newlines inside the
+     <pre>, so selecting and copying an example preserves its formatting. */
+  pre.ex .ok{color:#7ed48f}
+  pre.ex .no{color:#f5818d}
+  pre.ex .cmt{color:var(--dim); font-style:italic}
+  pre.ex .arw{color:var(--orange-dim)}
+
   .card-foot{margin-top:auto; padding-top:11px; border-top:1px solid var(--line); display:flex; gap:12px; align-items:center}
   .card-foot a{font-size:12.5px; font-weight:600}
   .when{font-size:11.5px; color:var(--dim); margin-left:auto; text-align:right}
@@ -141,12 +162,13 @@
   <div class="wrap">
     <div class="eyebrow">Grafana Cloud · Label Management</div>
     <h1>35 documents, distilled into conclusions you can act on</h1>
-    <p class="sub">Every source from the Label Management Documentation Reference (July 8, 2026), reduced to one conclusion and a short set of recommendations. Filter by signal, jump to the hard requirements, or follow a reading track.</p>
+    <p class="sub">Every source from the Label Management Documentation Reference (July 8, 2026), reduced to one conclusion, a worked example and a short set of recommendations. Filter by signal, jump to the hard requirements, or follow a reading track.</p>
     <div class="stats">
       <div class="stat"><b>35</b>documents</div>
       <div class="stat"><b>20</b>best practices</div>
       <div class="stat"><b>15</b>product label rules</div>
       <div class="stat"><b>9</b>hard requirements</div>
+      <div class="stat"><b>35</b>worked examples</div>
       <div class="stat"><b>~35&nbsp;min</b>for the essential 8</div>
     </div>
   </div>
@@ -170,7 +192,7 @@
   <p class="lede">Pick the track that matches why you opened this. Numbers link to the card below.</p>
   <div class="tracks">
     <div class="track">
-      <h3>🚀 Fastest useful path <span class="time">~35 min</span></h3>
+      <h3>Fastest useful path <span class="time">~35 min</span></h3>
       <ol>
         <li><a href="#d2">Loki label best practices</a></li>
         <li><a href="#d3">Cardinality</a></li>
@@ -183,7 +205,7 @@
       </ol>
     </div>
     <div class="track">
-      <h3>💸 "Our bill is climbing" <span class="time">~45 min</span></h3>
+      <h3>"Our bill is climbing" <span class="time">~45 min</span></h3>
       <ol>
         <li><a href="#d9">Cardinality management dashboards</a></li>
         <li><a href="#d10">High-cardinality metrics guidance</a></li>
@@ -195,7 +217,7 @@
       </ol>
     </div>
     <div class="track">
-      <h3>🔧 "My dashboards are empty" <span class="time">~30 min</span></h3>
+      <h3>"My dashboards are empty" <span class="time">~30 min</span></h3>
       <ol>
         <li><a href="#d25">Database Observability labels</a></li>
         <li><a href="#d21">App Observability metrics &amp; labels</a></li>
@@ -206,9 +228,9 @@
       </ol>
     </div>
     <div class="track">
-      <h3>🏗️ Designing a standard <span class="time">~90 min</span></h3>
+      <h3>Designing a standard <span class="time">~90 min</span></h3>
       <ol>
-        <li><a href="#d1">Understand labels</a> → <a href="#d2">best practices</a> → <a href="#d5">deep dive</a></li>
+        <li><a href="#d1">Understand labels</a> -> <a href="#d2">best practices</a> -> <a href="#d5">deep dive</a></li>
         <li><a href="#d22">OTel resource attributes</a></li>
         <li><a href="#d16">prometheus.relabel</a> + <a href="#d17">loki.relabel</a></li>
         <li><a href="#d19">Attribution labels</a></li>
@@ -225,7 +247,7 @@
       <input id="q" type="search" placeholder="Search titles, conclusions, label names…" autocomplete="off">
       <div class="chips" id="chips">
         <span class="chip on" data-f="all">All</span>
-        <span class="chip" data-f="must">⚠ Hard requirements</span>
+        <span class="chip" data-f="must">Hard requirements</span>
         <span class="chip" data-f="p1">Read first</span>
         <span class="chip" data-f="logs">Logs</span>
         <span class="chip" data-f="metrics">Metrics</span>
@@ -242,7 +264,7 @@
   <div class="empty" id="empty">Nothing matches that filter. <a href="#" onclick="reset();return false;">Reset</a></div>
 
   <footer>
-    <p><b>How to read a card:</b> the conclusion is the single thing the document establishes; the recommendations are what you change as a result. Everything is paraphrased and condensed — follow the source link before you implement, since limits and defaults change between releases.</p>
+    <p><b>How to read a card:</b> the conclusion is the single thing the document establishes; the example shows it concretely, with <span style="color:#7ed48f">+ green</span> for what to do and <span style="color:#f5818d">- red</span> for what breaks; the recommendations are what you change as a result. Examples are illustrative — service names, hostnames and counts are invented to make the shape obvious. Everything is paraphrased and condensed — follow the source link before you implement, since limits and defaults change between releases.</p>
     <p><b>Sources:</b> all 35 documents are published by Grafana Labs on <a href="https://grafana.com/docs/" target="_blank" rel="noopener">grafana.com</a>; each card links directly to its source. Content was rephrased for compliance with licensing restrictions.</p>
     <p><b>Two link corrections</b> vs. the original PDF: the Alerting "Labels and annotations" page now lives under <code>/docs/grafana/latest/alerting/fundamentals/alert-rules/annotation-label/</code>, and the Loki Label Strategies module under <code>learn.grafana.com/path/best-practice-guides/loki-label-strategies</code>.</p>
     <p>Generated from “Grafana Cloud — Label Management Documentation Reference”, dated July 8, 2026.</p>
@@ -257,6 +279,7 @@ const DOCS = [
   title:"Understand labels | Grafana Loki",
   url:"https://grafana.com/docs/loki/latest/get-started/labels/",
   when:"Before your first Loki config",
+  ex:"+ {cluster=\"eu-1\", namespace=\"checkout\", app=\"api\"}   -> one stream\n  This set IS the index. The log text itself is never indexed.\n  service_name auto-derived in order:\n    service -> app -> application -> container -> job -> unknown_service",
   concl:"Loki indexes only the label set, never the log text — so the combination of labels you ship <em>is</em> your index, and it silently decides how fast and how expensive every future query will be.",
   recs:[
     "Design the label strategy before the first log line is ingested; retrofitting means rewriting collector config and living with a split index.",
@@ -270,6 +293,7 @@ const DOCS = [
   title:"Label best practices | Grafana Loki",
   url:"https://grafana.com/docs/loki/latest/get-started/labels/bp-labels/",
   when:"The single highest-value read for logs",
+  ex:"- {app=\"loki\", level=\"error\"}       splits one app into 5 streams -> 5× chunks\n+ {app=\"loki\"} |= \"level=error\"     one stream, comparable speed\n\n- {app=\"loki\", level!=\"debug\"}      loads far more chunks\n+ {app=\"loki\"} != \"level=debug\"",
   concl:"Static, bounded labels are good; dynamic labels are a performance tax you pay at ingest and at query time — filter expressions on the log line are usually just as fast and cost nothing.",
   recs:[
     "Label infrastructure only: region, cluster, host, app, namespace, environment.",
@@ -284,9 +308,10 @@ const DOCS = [
   title:"Cardinality | Grafana Loki",
   url:"https://grafana.com/docs/loki/latest/get-started/labels/cardinality/",
   when:"When you need to explain the problem to someone else",
+  ex:"status_code (3: 200/404/500)  ×  action (5: GET/POST/PUT/PATCH/DELETE)\n                                             =     15 streams\n  ...plus endpoint (3: /cart, /products)     =     45 streams\n  ...plus request_id (24,653 values)         = ~1.1M streams\n\n- one unbounded key turns 45 streams into a 1.1M-stream index\n\n# audit it\nlogcli series '{}' --since=1h --analyze-labels",
   concl:"Cardinality is multiplicative, not additive: even labels with tiny value sets explode into streams when combined, which is why Loki's guidance is simply “fewer labels is better.”",
   recs:[
-    "Do the arithmetic before adding a key: status_code × action ≈ 15 streams, add endpoint and you are at 45.",
+    "Do the arithmetic before adding a key: status_code × action ~ 15 streams, add endpoint and you are at 45.",
     "Treat short-lived label values as worse than merely numerous — they produce a bloated index plus thousands of tiny chunks.",
     "Route high-cardinality-but-queried fields (customer ID, transaction ID) to structured metadata instead of dropping them.",
     "Run <code>logcli series '{}' --since=1h --analyze-labels</code> as a recurring hygiene check, not a one-off."
@@ -297,6 +322,7 @@ const DOCS = [
   title:"What is structured metadata | Grafana Loki",
   url:"https://grafana.com/docs/loki/latest/get-started/labels/structured-metadata/",
   when:"Right after you decide something isn't a label",
+  ex:"- as a label      {job=\"api\", pod=\"api-7d9f-x4k2\"}\n                  new stream on every deploy\n+ as metadata     {job=\"api\"} | pod=\"api-7d9f-x4k2\"\n                  queryable, never indexed\n\n# metric queries: drop auto-promoted metadata to stay under the series cap\ncount_over_time({job=\"api\"} | trace_id=\"0242ac12\" | keep job [5m])",
   concl:"Structured metadata is the sanctioned third place for data — attached per log line, not indexed, not buried in the message — and it is the answer to “but we need to search on pod name / trace ID.”",
   recs:[
     "Use it for high-cardinality fields that are frequently queried and awkward to embed: pod name, process/thread ID, container ID, user ID.",
@@ -311,6 +337,7 @@ const DOCS = [
   title:"The concise guide to Grafana Loki: labels (blog)",
   url:"https://grafana.com/blog/2023/12/20/the-concise-guide-to-grafana-loki-everything-you-need-to-know-about-labels/",
   when:"When you want the narrative, not the rules",
+  ex:"{host=\"rook\"}                                every app in one stream, slow\n{host=\"rook\", app=\"webserver\"}               bounded + long-lived  +\n{host=\"rook\", app=\"web\", order_id=\"81razz\"}  thousands of tiny streams  -\n\n# the 3-question test for any proposed label\n#   1. does it describe infrastructure?\n#   2. will it emit logs for hours, not seconds?\n#   3. would someone guess it at query time?",
   concl:"Labels are both the shard key and the index, and the most common failure is importing Prometheus-grade cardinality habits into Loki — the walked-through example shows an order-ID label fragmenting one host's logs into thousands of tiny streams.",
   recs:[
     "Test any proposed label against three questions: does it describe infrastructure, will it emit logs for hours, and is it intuitive at query time?",
@@ -323,6 +350,7 @@ const DOCS = [
   title:"Loki Label Strategies | Grafana Learn",
   url:"https://learn.grafana.com/path/best-practice-guides/loki-label-strategies",
   when:"Team enablement / onboarding",
+  ex:"# a label contract worth enforcing before a team gets write access\nlabels    (index):    cluster, namespace, app, env      <- 4 static keys\nmetadata  (searchable): pod, trace_id, request_id\nlog line  (filterable): everything else",
   concl:"A self-paced best-practice guide that packages the label-strategy material into a structured walkthrough of anti-patterns and label hygiene in real environments — the same guidance as the docs, in teachable form.",
   recs:[
     "Assign it rather than reading it yourself: use it as the onboarding step for new service teams before they get write access.",
@@ -335,6 +363,7 @@ const DOCS = [
   title:"Best practices for querying Grafana Mimir",
   url:"https://grafana.com/docs/mimir/latest/query/query-best-practices/",
   when:"Before you blame the backend for slow dashboards",
+  ex:"- sum(rate(http_requests_total[30d]))            re-read 30d, every 1m\n- {job=~\".*checkout.*\"}                          regex scan\n- fetch all series, then filter in a Grafana panel\n\n+ sum by (job) (rate(http_requests_total{job=\"shop/checkout\"}[5m]))\n+ expensive + frequently viewed -> make it a recording rule",
   concl:"Most query cost is self-inflicted: filter with exact label matchers as early in the query as possible, over the shortest feasible time range, and precompute anything expensive.",
   recs:[
     "Prefer <code>label=\"value\"</code> over <code>label=~\"pattern\"</code> — regex is materially more expensive.",
@@ -348,6 +377,7 @@ const DOCS = [
   title:"Query metric labels | Grafana Mimir",
   url:"https://grafana.com/docs/mimir/latest/query/query-metric-labels/",
   when:"When you're automating label discovery",
+  ex:"+ GET /prometheus/api/v1/label/job/values?start=…&end=…\n     fast path — always pass start/end\n- GET /prometheus/api/v1/cardinality/label_values\n     only when you genuinely need per-value series counts\n\n# 3 label names -> 3 get-label-values calls, not 1 cardinality call",
   concl:"Mimir offers two families of label APIs with different costs: the plain label names/values endpoints are the fast default, and the cardinality endpoints should only be used when you actually need per-label counts.",
   recs:[
     "Default to <code>/api/v1/labels</code> and <code>/api/v1/label/{name}/values</code>; reach for the cardinality endpoints only to count unique values or series.",
@@ -361,7 +391,8 @@ const DOCS = [
   title:"Analyze metrics usage with cardinality management dashboards",
   url:"https://grafana.com/docs/grafana-cloud/cost-management-and-billing/analyze-costs/metrics-costs/prometheus-metrics-costs/cardinality-management/",
   when:"Start here for any metrics cleanup",
-  concl:"Grafana Cloud ships three provisioned dashboards (overview → metric → label) that tell you which metrics and labels drive your active series, and crucially also flag which metrics nobody queries.",
+  ex:"Dashboards -> filter by tag: cardinality-management\n\n  1 overview   top label: pod -> 412k series   · used? NO\n  2 metrics    drill into one metric's worst labels\n  3 labels     which values own the most series\n\n+ Filter -> team = checkout   -> send that scoped URL to the team lead",
+  concl:"Grafana Cloud ships three provisioned dashboards (overview -> metric -> label) that tell you which metrics and labels drive your active series, and crucially also flag which metrics nobody queries.",
   recs:[
     "Find them by filtering dashboards on the <code>cardinality-management</code> tag; they cover the last two hours of active series in a single stack.",
     "Act on the used/unused split first — unused means not queried in 30 days and absent from dashboards, recording rules and alert rules. That is free savings.",
@@ -375,6 +406,7 @@ const DOCS = [
   title:"How to manage high cardinality metrics in Prometheus and Kubernetes (blog)",
   url:"https://grafana.com/blog/how-to-manage-high-cardinality-metrics-in-prometheus-and-kubernetes/",
   when:"Building the business case",
+  ex:"node_exporter     ~500 series/host   × 800 hosts = 400,000 series\nmysqld_exporter ~1,000 series/db\nkube_pod_status_phase              new series on every pod state change\n\n- session_id, user_id, device_id   unbounded — grows with traffic\n- dev-only metrics leaking into the prod remote_write",
   concl:"Cardinality growth in cloud-native estates is structural, not accidental: every layer of abstraction adds identifying labels, ephemeral workloads keep minting new series, and decentralised instrumentation removes the governance chokepoint.",
   recs:[
     "Expect state-churn metrics (e.g. pod phase) and short-lived jobs to generate series continuously — budget for them rather than being surprised.",
@@ -388,6 +420,7 @@ const DOCS = [
   title:"Examples of high-cardinality alerts | Grafana",
   url:"https://grafana.com/docs/grafana/latest/alerting/best-practices/high-cardinality-alerts/",
   when:"Once you've cleaned up — to stay clean",
+  ex:"# fires at 90% of your plan limit, not at an arbitrary number\n(\n  grafanacloud_instance_active_series\n  / on (id)\n    grafanacloud_instance_metrics_limits{limit_name=\"max_global_series_per_user\"}\n)\n* on (id) group_left(name) grafanacloud_instance_info\n> 0.9\n\n- count({__name__!=\"\"})   expensive — hide it behind a recording rule",
   concl:"Cardinality problems are detectable in advance, and this page gives you the four alert patterns to catch them: nearing limits, growth per metric, sudden spikes, and ingestion-rate jumps.",
   recs:[
     "In Cloud, alert on <code>grafanacloud_instance_active_series</code>; self-hosted, use <code>prometheus_tsdb_head_series</code>.",
@@ -402,6 +435,7 @@ const DOCS = [
   title:"Best practices for traces | Grafana Tempo",
   url:"https://grafana.com/docs/tempo/latest/getting-started/best-practices/",
   when:"The essential traces read",
+  ex:"+ http.request.method, http.response.status_code, db.system\n     3 attributes, semantic conventions, nested namespaces\n- httpMethod, status, request_body, cpu_pct, log_message\n     inconsistent + redundant + metrics/logs smuggled into a span\n\n+ one span for the loop, with a loop.iterations attribute\n- one span per iteration -> thousands of worthless spans",
   concl:"For traces the discipline shifts from cardinality to volume: keep attributes minimal and relevant, because every attribute adds tracing-system overhead and, in Grafana Cloud, cost — and when in doubt, leave it out.",
   recs:[
     "Follow OpenTelemetry semantic conventions and consistent nested namespaces (<code>http.url</code>, <code>http.status_code</code>) so attributes are guessable by anyone querying.",
@@ -416,6 +450,7 @@ const DOCS = [
   title:"Learn about trace structure and TraceQL",
   url:"https://grafana.com/docs/tempo/latest/traceql/trace-structure/",
   when:"When writing or reviewing TraceQL",
+  ex:"{ resource.service.name = \"checkout\" && span.http.response.status_code >= 500 }\n\n  resource.*  how the span was collected  (process, k8s, sdk)\n  span.*      what actually happened      (this unit of work)\n\n# if the query you'd write is awkward, the attribute name is wrong",
   concl:"TraceQL selects spans, not traces: a query is a pipeline evaluated one trace at a time that returns spansets, which is why your attribute naming determines whether queries are writable at all.",
   recs:[
     "Understand the split between span attributes, resource attributes and intrinsics before you decide where a field belongs.",
@@ -428,6 +463,7 @@ const DOCS = [
   title:"Metrics from traces | Grafana Tempo",
   url:"https://grafana.com/docs/tempo/latest/metrics-from-traces/",
   when:"Before enabling span metrics",
+  ex:"span attributes become metric dimensions — each one multiplies series\n\n+ service, span_name, span_kind, status_code        bounded, useful\n- + http.url (one value per unique path/query)      blowout\n\n# don't use service maps? turn service graph generation off",
   concl:"Your span attributes become metric dimensions: the metrics-generator turns spans into stored RED metrics and service graphs, so trace-side attribute sprawl converts directly into metrics cardinality and spend.",
   recs:[
     "Choose deliberately: metrics-generator for continuous monitoring and alerting (written to Prometheus/Mimir), TraceQL metrics for ad-hoc exploration with no extra storage.",
@@ -441,6 +477,7 @@ const DOCS = [
   title:"Configure the client to send profiles | Grafana Pyroscope",
   url:"https://grafana.com/docs/pyroscope/latest/configure-client/",
   when:"Setting up continuous profiling",
+  ex:"- deployment.environment=prod     '.' is invalid in Pyroscope tags\n+ deployment_environment=prod     must match [a-zA-Z_][a-zA-Z0-9_]*\n\ncommon tags: version, region, environment, request_type\n# send SDK profiles via Alloy to attach k8s metadata outside app code",
   concl:"Profiles follow the same labelling logic as the other signals, with one syntactic catch: Pyroscope tags must match <code>[a-zA-Z_][a-zA-Z0-9_]*</code>, so dotted OTel-style attribute names are invalid.",
   recs:[
     "Convert dotted names before shipping — <code>deployment.environment</code> has to become <code>deployment_environment</code>.",
@@ -454,6 +491,7 @@ const DOCS = [
   title:"prometheus.relabel | Grafana Alloy",
   url:"https://grafana.com/docs/alloy/latest/reference/components/prometheus/prometheus.relabel/",
   when:"Implementing the standard in the pipeline",
+  ex:"prometheus.relabel \"standardise\" {\n  forward_to     = [prometheus.remote_write.cloud.receiver]\n  max_cache_size = 0          // TTL mode: sizes itself to the working set\n  cache_ttl      = \"10m\"      // beats guessing max_cache_size\n\n  rule { action = \"labeldrop\", regex = \"pod|container_id\" }\n}\n# __-prefixed labels are already gone here — use discovery.relabel for those",
   concl:"<code>prometheus.relabel</code> is where a label policy actually gets enforced — it rewrites, adds and drops metric labels in ordered rule blocks, and any metric left with no labels is dropped entirely.",
   recs:[
     "Order matters: rules apply top-down, so put drops and keeps before replacements.",
@@ -467,6 +505,7 @@ const DOCS = [
   title:"loki.relabel | Grafana Alloy",
   url:"https://grafana.com/docs/alloy/latest/reference/components/loki/loki.relabel/",
   when:"Fixing log labels before ingestion",
+  ex:"loki.relabel \"trim\" {\n  forward_to = [loki.write.cloud.receiver]\n\n  rule { action = \"labeldrop\", regex = \"request_id|trace_id\" }\n}\n\n# confirm the rules do what you think\nloki_relabel_entries_processed  vs  loki_relabel_entries_written\n# content, not labels? -> loki.process instead",
   concl:"The same relabeling model applied to log streams: <code>loki.relabel</code> rewrites the label set before ingestion, which makes it the enforcement point for stream-cardinality control — and <code>labeldrop</code>/<code>labelkeep</code> your cleanup tools.",
   recs:[
     "Use <code>labeldrop</code>/<code>labelkeep</code> to strip labels a client added speculatively, and <code>drop</code>/<code>keep</code> to discard whole entries.",
@@ -480,7 +519,8 @@ const DOCS = [
   title:"Logs and relabeling basics in Grafana Alloy",
   url:"https://grafana.com/docs/alloy/latest/tutorials/logs-and-relabeling-basics/",
   when:"Hands-on learning",
-  concl:"A working end-to-end pipeline you can copy: scrape → relabel → remote write for metrics, and file discovery → source → write for logs, including extracting a label out of log content.",
+  ex:"# two separate keep rules behave as AND.\n# for OR, use ONE rule with a compound regex:\nrule {\n  source_labels = [\"__meta_kubernetes_pod_annotation_A\",\n                   \"__meta_kubernetes_pod_label_B\"]\n  regex         = \"(true;.*|.*;true)\"\n  action        = \"keep\"\n}",
+  concl:"A working end-to-end pipeline you can copy: scrape -> relabel -> remote write for metrics, and file discovery -> source -> write for logs, including extracting a label out of log content.",
   recs:[
     "Two practical gotchas worth internalising: multiple <code>keep</code> rules behave as AND (combine <code>source_labels</code> with a compound regex for OR), and <code>__</code>-prefixed labels need <code>discovery.relabel</code>.",
     "The <code>level</code>-extraction exercise is exactly the pattern to scrutinise in review — it's the canonical example of a label you probably shouldn't create.",
@@ -492,6 +532,7 @@ const DOCS = [
   title:"Understand attribution labels | Grafana Cloud",
   url:"https://grafana.com/docs/grafana-cloud/cost-management-and-billing/cost-attributions/labels/",
   when:"Before you promise anyone a cost breakdown",
+  ex:"team (3) × environment (3)   =      9 combos   + under the 1,000 cap\nteam (40) × service (300)    = 12,000 combos   - rejected at config time\n\n- teams / Team / team        three keys, mostly unattributed\n- pod_name, version         change constantly -> attribution drifts\n+ backfill gaps with an Alloy or OTel Collector processor",
   concl:"Cost attribution is only as good as label coverage: pick labels on three axes — coverage, granularity and stability — because anything missing your chosen key is reported as unattributed.",
   recs:[
     "Choose high-coverage, stable keys: <code>service_name</code>, <code>environment</code>, <code>team</code>. Never pod names, container IDs or version numbers.",
@@ -507,6 +548,7 @@ const DOCS = [
   title:"Metrics cost management in Grafana Cloud: a complete guide (blog)",
   url:"https://grafana.com/blog/metrics-cost-management-in-grafana-cloud-guide/",
   when:"When the manual approach has stalled",
+  ex:"http_request_duration_seconds{job, le, pod, container_id, node}\n\n  nobody ever groups by pod / container_id / node\n  -> aggregate those away at ingest\n  -> 48 series become 4, dashboards and alerts unchanged\n\n# monitor smarter, not less — dropping whole metrics loses signal",
   concl:"The five DIY approaches to metrics cost — ask developers, silo into extra Prometheus, audit manually, build in-house, do nothing — each trade observability or engineering time; Adaptive Metrics automates the “drop only what's unused” analysis at ingest.",
   recs:[
     "Reframe the goal as monitoring smarter, not monitoring less — reflexively cutting ingestion is how critical signals get dropped.",
@@ -522,6 +564,7 @@ const DOCS = [
   title:"Application Observability required metrics and labels",
   url:"https://grafana.com/docs/grafana-cloud/monitor-applications/application-observability/setup/metrics-labels/",
   when:"Before onboarding a service",
+  ex:"service.namespace=shop + service.name=checkout  ->  job=\"shop/checkout\"\n\nrequired  target_info{job}\nrequired  traces_spanmetrics_latency{job, span_kind, status_code, le}\n\n- no deployment_environment -> baselines silently stop working\n- no span_name              -> no per-endpoint breakdown\n- no status_code            -> errors panel empty",
   concl:"Application Observability is contractual about two labels — <code>job</code> (derived as <code>service.namespace/service.name</code>, or just <code>service.name</code>) and <code>deployment_environment</code> — and specific UI features fail silently without specific labels.",
   recs:[
     "Mandatory series: <code>target_info</code>/<code>traces_target_info</code> (drives service inventory) and the span-metrics latency family (drives RED panels). Both require <code>job</code>.",
@@ -538,6 +581,7 @@ const DOCS = [
   title:"Application Observability resource attributes",
   url:"https://grafana.com/docs/grafana-cloud/monitor-applications/application-observability/setup/resource-attributes/",
   when:"Reference card for instrumentation",
+  ex:"OTEL_RESOURCE_ATTRIBUTES=\"service.namespace=shop,\\\n service.name=checkout,\\\n deployment.environment.name=production,\\\n service.version=1.4.2\"\n\n-> job      = \"shop/checkout\"        (namespace/name)\n-> instance = service.instance.id    (e.g. the pod)",
   concl:"Five OTel resource attributes carry the whole model, and the mapping into Prometheus/Loki is fixed by the OTel compatibility spec: <code>job</code> comes from namespace+name, <code>instance</code> from <code>service.instance.id</code>.",
   recs:[
     "Set <code>service.name</code>, <code>service.namespace</code>, <code>deployment.environment</code>, <code>service.instance.id</code> and <code>service.version</code> — they are your filter and group-by surface across all three signals.",
@@ -550,6 +594,7 @@ const DOCS = [
   title:"Instrumentation quality | Grafana Cloud",
   url:"https://grafana.com/docs/grafana-cloud/monitor-applications/application-observability/setup/instrumentation-quality/",
   when:"Your built-in audit tool",
+  ex:"- service.name=\"shop/checkout\"        slash defeats grouping features\n+ service.namespace=\"shop\" + service.name=\"checkout\"\n\n+ k8s.cluster.name, k8s.namespace.name, k8s.pod.name   -> links to K8s\n+ exactly ONE workload attr (k8s.deployment.name)      -> pod links\n- extracting all six workload attrs   -> needless cardinality",
   concl:"There's a per-service Quality report that enumerates exactly which attributes are missing and what breaks as a result — use it instead of guessing at instrumentation gaps.",
   recs:[
     "Set <code>deployment.environment.name</code> (or legacy <code>deployment.environment</code>) — without it services group wrongly and baselines don't work: <code>OTEL_RESOURCE_ATTRIBUTES=\"deployment.environment.name=production\"</code>.",
@@ -564,6 +609,7 @@ const DOCS = [
   title:"Metas | Grafana Cloud (Frontend Observability)",
   url:"https://grafana.com/docs/grafana-cloud/monitor-applications/frontend-observability/introduction/metas/",
   when:"Faro / browser instrumentation setup",
+  ex:"initializeFaro({\n  url: 'https://…/collect/{app-key}',\n  app: {\n    name:        'storefront',   // required  -> service.name\n    version:     '1.4.2',        // optional  -> service.version\n    environment: 'production'    // optional  -> deployment.environment\n  }\n});\n# align these with your backend service names or correlation breaks",
   concl:"Frontend Observability's label equivalent is the meta, and only the app meta is mandatory — but the optional <code>version</code> and <code>environment</code> fields are what make the data answer real questions.",
   recs:[
     "At minimum provide <code>app.name</code> in <code>initializeFaro()</code>; add <code>version</code> and <code>environment</code> to compare error rates across releases and environments.",
@@ -577,6 +623,7 @@ const DOCS = [
   title:"Labels reference | Database Observability",
   url:"https://grafana.com/docs/grafana-cloud/monitor-applications/database-observability/reference/labels/",
   when:"The strictest requirements in the set",
+  ex:"# set in BOTH loki.relabel AND discovery.relabel, identical values\nrule { target_label = \"job\"      replacement = \"integrations/db-o11y\" }\nrule { target_label = \"instance\" replacement = \"orders-db.prod.example.com:5432\" }\n\n- \"integrations/db-o11y-prod\"   dashboards find nothing\n- \"10.0.0.5:5432\"               IPs change\n- \"orders-db\"                   port missing\n- Aurora cluster / reader endpoint — routes to different instances",
   concl:"Two labels are non-negotiable: <code>job</code> must be exactly <code>integrations/db-o11y</code> and <code>instance</code> must be <code>hostname:port</code> and identical across metrics and logs — otherwise the dashboards find nothing.",
   recs:[
     "Set both in <b>both</b> <code>loki.relabel</code> and <code>discovery.relabel</code>, with matching values.",
@@ -592,6 +639,7 @@ const DOCS = [
   title:"Enable multi-cluster support (optional)",
   url:"https://grafana.com/docs/grafana-cloud/monitor-infrastructure/kubernetes-monitoring/configuration/config-other-methods/helm-operator-migration/multi_cluster/",
   when:"Only if you migrated from Kube-Prometheus",
+  ex:"mimirtool rules prepare -i *.yaml     # adds cluster to every aggregation\n                                     # omit -i for a dry run\n\n# the label must match what Prometheus already sends\nexternal_labels:\n  cluster: prod-eu-1\n\n# then re-import the rules — rewriting alone changes nothing",
   concl:"Multi-cluster views depend on a <code>cluster</code> label being present in rule aggregations, and existing rule sets usually need rewriting to include it — <code>mimirtool rules prepare</code> does that mechanically.",
   recs:[
     "Run <code>mimirtool rules prepare -i *.yaml</code> to add/keep the aggregation label across recording and alerting rules (drop <code>-i</code> to dry-run first).",
@@ -605,6 +653,7 @@ const DOCS = [
   title:"Manage your configuration | Kubernetes Monitoring",
   url:"https://grafana.com/docs/grafana-cloud/monitor-infrastructure/kubernetes-monitoring/configuration/manage-configuration/",
   when:"Understanding what the Helm chart guarantees",
+  ex:"pod logs MUST reach Loki with:  cluster, namespace, pod\n\n- labeldrop pod   -> logs-to-workload navigation breaks\n- trimming the allowlist below what Cluster navigation needs:\n    kube_pod_status_phase, container_cpu_usage_seconds_total,\n    node_namespace_pod_container, kube_node.+, kube_replicaset.+ …",
   concl:"Kubernetes Monitoring's navigation and cost features depend on a specific metric and label contract — most importantly, pod logs must arrive in Loki carrying <code>cluster</code>, <code>namespace</code> and <code>pod</code> labels.",
   recs:[
     "Preserve the <code>cluster</code>/<code>namespace</code>/<code>pod</code> log labels; dropping them to save cardinality breaks the logs-to-workload navigation.",
@@ -618,6 +667,7 @@ const DOCS = [
   title:"Linux Server integration | Grafana Cloud",
   url:"https://grafana.com/docs/grafana-cloud/data-configuration/integrations/integration-reference/integration-linux-node",
   when:"Before filtering integration metrics",
+  ex:"rule { target_label = \"job\"      replacement = \"integrations/node_exporter\" }\nrule { target_label = \"instance\" replacement = constants.hostname }\n\n# journal-derived log labels the 7 dashboards query — keep them\nunit, boot_id, transport, level, service_name, name, source\n\n# enabling metric filtering breaks anything custom built off other metrics",
   concl:"The integration's 7 dashboards and 24 alerts are hard-wired to a specific label set — <code>job=integrations/node_exporter</code> plus <code>instance</code>, and journal-derived labels for logs — so its relabel snippets are a contract, not a suggestion.",
   recs:[
     "Copy the provided Alloy snippets as-is: <code>job=integrations/node_exporter</code> and <code>instance=constants.hostname</code> must be set identically for metrics and logs.",
@@ -631,6 +681,7 @@ const DOCS = [
   title:"Kafka integration | Grafana Cloud",
   url:"https://grafana.com/docs/grafana-cloud/monitor-infrastructure/integrations/integration-reference/integration-kafka/",
   when:"Kafka onboarding",
+  ex:"broker-1   instance=kafka-1:7001   kafka_cluster=orders-prod\nbroker-2   instance=kafka-2:7001   kafka_cluster=orders-prod   <- same value\nzookeeper  instance=zk-1:7001      kafka_cluster=orders-prod   <- same value\nksqldb     instance=ksql-1:7001    kafka_cluster=orders-prod   <- same value\n\n- one shared instance value across nodes -> metrics collide\n# kafka_cluster exists so it can't clash with k8s reserved 'cluster'",
   concl:"Kafka uses a deliberately non-standard <code>kafka_cluster</code> label — precisely to avoid colliding with the Kubernetes-reserved <code>cluster</code> label — and every node in a cluster must carry the same value for dashboards to group correctly.",
   recs:[
     "Set the same <code>kafka_cluster</code> value on every component: brokers, ZooKeeper, Kafka Connect, Schema Registry, ksqlDB.",
@@ -645,6 +696,7 @@ const DOCS = [
   title:"Custom labels | Synthetic Monitoring",
   url:"https://grafana.com/docs/grafana-cloud/testing/synthetic-monitoring/analyze-results/custom-labels/",
   when:"Organising checks and alert routing",
+  ex:"check labels -> environment=prod, team=checkout\n\nprobe_success{environment=\"prod\"}\n{source=\"synthetic-monitoring-agent\", environment=\"prod\"}\n\n- job, instance, probe are reserved names\n# 10 labels/check, 3/private probe; Loki indexes <= 15 per stream",
   concl:"Custom labels on checks propagate onto every metric and log the check produces, so they double as your query filter and your alert-routing key with no extra wiring — up to 10 per check (3 per private probe).",
   recs:[
     "Filter directly: <code>probe_success{environment=\"prod\"}</code> and <code>{source=\"synthetic-monitoring-agent\", environment=\"prod\"}</code>.",
@@ -659,6 +711,7 @@ const DOCS = [
   title:"Manage labels and cost attribution | Grafana Cloud k6",
   url:"https://grafana.com/docs/grafana-cloud/testing/k6/projects-and-users/manage-labels/",
   when:"Charging back load-testing spend",
+  ex:"project \"Checkout load\"  ->  team=checkout, environment=staging\n\n  future runs   attributed to those labels\n  past runs     unchanged, forever\n\nlimits: 100 keys/org · 30 labels/project · key <= 64 chars\n# tracks VUH consumption only, not labels on individual k6 metrics",
   concl:"k6 project labels are stack-level metadata applied to every test run in a project, and they are the only thing that lets cost attribution break down Virtual User Hour consumption — but they never apply retroactively.",
   recs:[
     "Label projects <em>before</em> the runs you care about: past runs keep whatever labels they had, edits and deletions only affect future runs.",
@@ -672,6 +725,7 @@ const DOCS = [
   title:"Tags and Groups | Grafana k6",
   url:"https://grafana.com/docs/k6/latest/using-k6/tags-and-groups/",
   when:"Writing test scripts",
+  ex:"export const options = { tags: { env: 'staging', team: 'backend' } };\n\n$ k6 run --tag region=us-east script.js\n  -> result tags: { region: 'us-east' }   ONLY\n  -> env and team are DISCARDED, not merged\n\n# enable the merge-run-tags feature flag to combine sources instead",
   concl:"k6 tags are a different mechanism from project labels: they live inside the test, categorise requests, checks, thresholds and custom metrics, and can also scope which operations a threshold evaluates.",
   recs:[
     "Lean on system tags first (<code>status</code>, <code>method</code>, <code>url</code>, <code>name</code>, <code>group</code>, <code>check</code>, <code>scenario</code>, <code>error_code</code>…) before inventing your own; trim with <code>systemTags</code>, but note some collectors require certain tags.",
@@ -685,6 +739,7 @@ const DOCS = [
   title:"Best practices for labels | Grafana IRM",
   url:"https://grafana.com/docs/grafana-cloud/alerting-and-irm/irm/guides/best-practices/labeling/",
   when:"Designing alert routing",
+  ex:"namespace=checkout    -> route to the owning team     (coarse)\nseverity=critical     -> page vs ticket                (fine)\nservice_name=api      -> Service Center views          (fine)\ncluster=prod-eu-1     -> triage context\n\n4 labels. That's what Grafana's own engineering team uses.\n# audit: alerts landing on the default route = missing routing labels",
   concl:"Alert labels serve exactly three purposes — routing, triage, analytics — and 4–5 labels total is enough for most organisations; more adds complexity without proportional benefit.",
   recs:[
     "Route coarse then fine: <code>team_name</code>/<code>domain</code>/<code>namespace</code> to reach the right group, then <code>severity</code>/<code>service_name</code> to refine. Grafana's own engineering team uses four: namespace, severity, service_name, cluster.",
@@ -700,6 +755,7 @@ const DOCS = [
   title:"Labels and annotations | Grafana Alerting",
   url:"https://grafana.com/docs/grafana/latest/alerting/fundamentals/alert-rules/annotation-label/",
   when:"Fundamentals before you tune routing",
+  ex:"labels       severity=critical, team=checkout    -> routing, silences, identity\nannotations  summary, description, runbook_url     -> human context\n\n- two rules both emitting {alertname=\"X\", team=\"checkout\"}\n    -> one alert instance is silently discarded\n# a configured label replaces a query label of the same name",
   concl:"In Alerting the label set <em>is</em> the alert instance's identity — it's what notification policies and silences match on — so label design is alert design, and annotations (not labels) are where human context belongs.",
   recs:[
     "Understand the three label sources: user-configured (<code>severity</code>, <code>team</code>, <code>service</code>), query-returned (which fan one rule into many instances), and reserved (<code>alertname</code>, <code>grafana_folder</code>).",
@@ -714,6 +770,7 @@ const DOCS = [
   title:"Set up cost attribution | Grafana Cloud",
   url:"https://grafana.com/docs/grafana-cloud/cost-management-and-billing/cost-attributions/set-up/",
   when:"The click-path, once labels are in place",
+  ex:"Metrics key: team    Logs key: team    Traces key: service.namespace\nLabel Name:  \"Team\"  <- display alias across differing keys\n\n- prohibited: job, instance, tenant, stack_id, org_id, __*\n\nenabled 22 Sep -> zero data before 22 Sep, and it cannot be backfilled",
   concl:"Attribution is configured per stack from labels that already exist on your telemetry, and it only starts collecting from the moment you enable it — historical data cannot be regenerated, so enabling it early is free insurance.",
   recs:[
     "Enable it now, even with imperfect labels: turn it on partway through a month and you only ever see costs from that point on.",
@@ -730,6 +787,28 @@ const grid = document.getElementById('grid');
 const tagLabel = {logs:"Logs", metrics:"Metrics", traces:"Traces", profiles:"Profiles", cost:"Cost", product:"Product"};
 const priLabel = {p1:"Read first", p2:"Then", p3:"Reference"};
 
+const esc = s => s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+
+/* Colourise an example block line by line, diff-style:
+     +   do this          -> green
+     -   this breaks      -> red
+     #  or //  comment    -> dim italic
+     -> or <-  pointer    -> orange
+   Only ASCII markers are used, so nothing depends on a font shipping
+   dingbat or emoji glyphs. Lines are escaped before markup is added, so
+   examples may safely contain angle brackets and ampersands.
+   Order matters: "->" is tested before the bare "-" marker. */
+function exHtml(t){
+  return t.split('\n').map(line=>{
+    const e = esc(line);
+    if(/^\s*(->|<-)/.test(line))   return `<span class="arw">${e}</span>`;
+    if(/^\s*\+\s/.test(line))      return `<span class="ok">${e}</span>`;
+    if(/^\s*-\s/.test(line))       return `<span class="no">${e}</span>`;
+    if(/^\s*(#|\/\/)/.test(line))  return `<span class="cmt">${e}</span>`;
+    return e;
+  }).join('\n');
+}
+
 grid.innerHTML = DOCS.map(d=>{
   const chips = [
     d.must ? `<span class="t must">Hard requirement</span>` : "",
@@ -739,7 +818,7 @@ grid.innerHTML = DOCS.map(d=>{
   return `
   <article class="card" id="${d.id}"
       data-tags="${d.tags.join(' ')} ${d.pri} ${d.must?'must':''}"
-      data-text="${(d.title+' '+d.topic+' '+d.concl+' '+d.recs.join(' ')).replace(/<[^>]+>/g,'').replace(/"/g,'&quot;').toLowerCase()}">
+      data-text="${(d.title+' '+d.topic+' '+d.concl+' '+d.recs.join(' ')+' '+d.ex).replace(/<[^>]+>/g,'').replace(/\s+/g,' ').replace(/"/g,'&quot;').toLowerCase()}">
     <div class="card-top">
       <div class="idx">${d.n}</div>
       <div>
@@ -753,11 +832,15 @@ grid.innerHTML = DOCS.map(d=>{
       <p class="concl">${d.concl}</p>
     </div>
     <div class="block">
+      <div class="lbl">Example</div>
+      <pre class="ex">${exHtml(d.ex)}</pre>
+    </div>
+    <div class="block">
       <div class="lbl">What to do</div>
       <ul class="recs">${d.recs.map(r=>`<li>${r}</li>`).join("")}</ul>
     </div>
     <div class="card-foot">
-      <a href="${d.url}" target="_blank" rel="noopener">Open source →</a>
+      <a href="${d.url}" target="_blank" rel="noopener">Open source -></a>
       <span class="when">${d.when}</span>
     </div>
   </article>`;
