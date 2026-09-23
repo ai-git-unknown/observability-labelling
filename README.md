@@ -48,6 +48,29 @@ Two links in the source PDF are stale and have been corrected here:
 
 All 35 links were checked; 34 return HTTP 200 and the Grafana Learn URL is reachable in a browser but returns 403 to automated requests.
 
+## The labelling contract
+
+Alongside the digest, this repository holds our own cross-domain labelling and correlation contract, covering the four application categories in our estate: applications we control on AWS, SaaS we administer, purchased software we host on EC2, and everything else.
+
+| Format | File | Use |
+|---|---|---|
+| Markdown | [`docs/labelling-contract.md`](docs/labelling-contract.md) | Source of truth, reviewable in pull requests |
+| HTML | [`contract.html`](contract.html) | Reading online, with contents sidebar and print styles |
+
+The HTML is generated. After editing the Markdown:
+
+```sh
+node tools/build-contract.js
+```
+
+No dependencies and no install step. The generator supports only the Markdown subset the contract uses and fails loudly rather than emitting wrong HTML.
+
+### The three load-bearing decisions
+
+- **`service_name` is the identity key, not `job`.** Grafana Cloud integrations hard-code `job` (`integrations/db-o11y`, `integrations/kafka`) and it is prohibited as a cost-attribution label, so it cannot identify a service across domains.
+- **`team` is resolved from `application`, never declared per service.** This pins cost-attribution combinations to roughly the number of applications instead of the product of teams and applications, keeping us inside the 1,000-combination cap.
+- **Labels are applied in the pipeline, not only in code.** Three of the four categories have no code we control, so Alloy relabel rules driven by a registry are the enforcement point.
+
 ## Attribution
 
 Every source document is published by Grafana Labs on [grafana.com](https://grafana.com/docs/) and each card links directly to its source. Summaries are paraphrased and condensed — consult the source before implementing, since limits and defaults change between releases. Content was rephrased for compliance with licensing restrictions.
