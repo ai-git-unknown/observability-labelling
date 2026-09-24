@@ -6,10 +6,20 @@
  * package.json, no install step, no lockfile to keep current. It supports
  * only the Markdown subset the contract actually uses -- headings, tables,
  * fenced code, flat lists, blockquotes, horizontal rules and inline
- * code/bold/italic/links -- and throws on anything it cannot represent
- * rather than emitting silently wrong HTML.
+ * code/bold/italic/links -- and throws on the constructs it knows it cannot
+ * represent (indented lines, h5+, images, raw HTML, ragged tables, unclosed
+ * bold) rather than emitting silently wrong HTML.
  *
- * Usage:  node tools/build-contract.js
+ * Review markers are highlighted so reviewers can find every change:
+ *   > **Added in v0.2 ...** / > **Changed in v0.2 ...**   callout
+ *   **[v0.2]**                                           changed item
+ *   **[review]**                                         open decision
+ *
+ * The date shown is the **Updated** field in the Markdown, not the build
+ * day, so rebuilding unchanged Markdown produces identical HTML.
+ *
+ * Usage:  node tools/build-contract.js            write contract.html
+ *         node tools/build-contract.js --check    exit 1 if it is stale
  */
 'use strict';
 
@@ -54,7 +64,12 @@ function inline(text) {
   });
 
   out = out.replace(/\*\*([^*]+)\*\*/g, '<strong>$1</strong>');
+  if (out.includes('**')) throw new Error(`unclosed bold in: ${text}`);
   out = out.replace(/(^|[\s(])\*([^*\n]+)\*/g, '$1<em>$2</em>');
+
+  // Review markers.
+  out = out.replace(/<strong>\[(v\d+(?:\.\d+)*)\]<\/strong>/g, '<span class="rv chg">$1</span>');
+  out = out.replace(/<strong>\[review\]<\/strong>/g, '<span class="rv open">review</span>');
 
   return out.replace(/\u0000(\d+)\u0000/g, (_, i) => `<code>${escapeHtml(codes[+i])}</code>`);
 }
@@ -85,6 +100,13 @@ function render(md) {
       continue;
     }
 
+    // Constructs this generator cannot represent. Fail rather than guess.
+    const where = `${path.relative(ROOT, SRC)}:${i + 1}`;
+    if (/^\s+\S/.test(line)) throw new Error(`${where}: indented line (nested list or continuation) is not supported`);
+    if (/^#{5,}\s/.test(line)) throw new Error(`${where}: headings below h4 are not supported`);
+    if (/^!\[/.test(line)) throw new Error(`${where}: images are not supported`);
+    if (/^<[a-zA-Z!/]/.test(line)) throw new Error(`${where}: raw HTML is not supported`);
+
     // horizontal rule
     if (/^---+\s*$/.test(line)) { html.push('<hr>'); i++; continue; }
 
@@ -106,7 +128,15 @@ function render(md) {
       const head = cells(line);
       i += 2;
       const body = [];
-      while (i < lines.length && lines[i].includes('|') && lines[i].trim()) body.push(cells(lines[i++]));
+      while (i < lines.length && lines[i].includes('|') && lines[i].trim()) {
+        const row = cells(lines[i]);
+        // A "|" inside a cell, even inside code, splits it; catch that here.
+        if (row.length !== head.length) {
+          throw new Error(`${path.relative(ROOT, SRC)}:${i + 1}: table row has ${row.length} cells, header has ${head.length}`);
+        }
+        body.push(row);
+        i++;
+      }
       html.push(
         '<div class="tw"><table><thead><tr>' +
         head.map(c => `<th>${inline(c)}</th>`).join('') +
@@ -121,7 +151,9 @@ function render(md) {
     if (/^>\s?/.test(line)) {
       const buf = [];
       while (i < lines.length && /^>\s?/.test(lines[i])) buf.push(lines[i++].replace(/^>\s?/, ''));
-      html.push(`<blockquote>${inline(buf.join(' '))}</blockquote>`);
+      const text = buf.join(' ');
+      const cls = /^\*\*(Added|Changed) in v\d/.test(text) ? ' class="review"' : '';
+      html.push(`<blockquote${cls}>${inline(text)}</blockquote>`);
       continue;
     }
 
@@ -144,6 +176,7 @@ function render(md) {
     const buf = [];
     while (i < lines.length && lines[i].trim() && !/^(#{1,4}\s|```|>|---+\s*$)/.test(lines[i])
            && !/^\s*([-*]|\d+\.)\s+/.test(lines[i])
+           && !/^\s+\S/.test(lines[i])
            && !(lines[i].includes('|') && i + 1 < lines.length && isTableSep(lines[i + 1]))) {
       buf.push(lines[i++]);
     }
@@ -152,24 +185,35 @@ function render(md) {
     html.push(`<p>${inline(buf.join(' '))}</p>`);
   }
 
+  // Flag contents entries whose section contains review markers.
+  let cur = -1;
+  for (const b of html) {
+    if (b.startsWith('<h2 ')) cur++;
+    if (cur >= 0 && /class="(rv |review)/.test(b)) toc[cur].review = true;
+  }
+
   return { body: html.join('\n'), toc };
 }
 
 /* ---------------- page ---------------- */
 
 function page(body, toc, meta) {
-  const nav = toc.map(t => `<a href="#${t.id}">${t.text}</a>`).join('');
+  const nav = toc.map(t =>
+    `<a href="#${t.id}">${escapeHtml(t.text.replace(/\*\*\[[^\]]+\]\*\*/g, '').trim())}` +
+    `${t.review ? '<span class="dot" title="Contains v0.2 changes or open review items"></span>' : ''}</a>`
+  ).join('');
+  const title = escapeHtml(meta.title);
   return `<!DOCTYPE html>
 <html lang="en">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>${meta.title}</title>
+<title>${title}</title>
 <style>
   :root{
     --bg:#0b0c0e; --card:#181b20; --card2:#1f232a; --line:#2b3038;
     --text:#e6e9ef; --muted:#9aa4b2; --dim:#6b7683;
-    --orange:#ff6b35; --orange-dim:#ff8c5a; --blue:#5794f2; --red:#f2596a; --green:#56c46b;
+    --orange:#ff6b35; --orange-dim:#ff8c5a; --blue:#5794f2; --red:#f2596a; --green:#56c46b; --yellow:#f2cc0c;
   }
   *{box-sizing:border-box}
   html{scroll-behavior:smooth}
@@ -231,6 +275,16 @@ function page(body, toc, meta) {
     border-left:3px solid var(--orange);border-radius:0 8px 8px 0;color:#e2e6ed;max-width:86ch}
   blockquote p{margin:0}
 
+  /* Review highlighting: yellow = changed in this version, red = open decision. */
+  blockquote.review{background:rgba(242,204,12,.07);border-left-color:var(--yellow)}
+  .rv{display:inline-block;font-size:10.5px;font-weight:700;letter-spacing:.05em;text-transform:uppercase;
+    border-radius:4px;padding:0 6px;margin:0 2px;vertical-align:1px;line-height:1.6}
+  .rv.chg{background:rgba(242,204,12,.16);color:#e3c43a}
+  .rv.open{background:rgba(242,89,106,.18);color:#f5818d}
+  nav.toc .dot{display:inline-block;width:6px;height:6px;border-radius:50%;background:var(--yellow);
+    margin-left:7px;vertical-align:2px}
+  .legend{font-size:12.5px;color:var(--dim);margin-top:10px}
+
   footer{border-top:1px solid var(--line);margin-top:54px;padding-top:20px;color:var(--dim);font-size:12.5px}
   footer p{margin:0 0 7px;max-width:92ch}
 
@@ -241,7 +295,13 @@ function page(body, toc, meta) {
   }
   @media print{
     body{background:#fff;color:#111}
-    nav.toc,header.top{display:none}
+    nav.toc,.backlink{display:none}
+    header.top{background:none;border-left:4px solid #999;padding:0 0 14px 14px;margin-bottom:10px}
+    header.top h1{color:#111}
+    .badge{border-color:#bbb;color:#333;background:none}
+    .badge b{color:#111}
+    .rv{background:none!important;border:1px solid #888;color:#111!important}
+    blockquote,blockquote.review{background:none;color:#111;border-left-color:#888}
     .shell{display:block;padding:0}
     main p,main li,td{color:#222}
     pre.code,code{background:#f5f5f5;color:#111;border-color:#ddd}
@@ -253,13 +313,16 @@ function page(body, toc, meta) {
 <header class="top">
   <div class="in">
     <div class="eyebrow">Observability Programme</div>
-    <h1>${meta.title}</h1>
+    <h1>${title}</h1>
     <div class="badges">
-      <span class="badge">Version <b>${meta.version}</b></span>
-      <span class="badge">Status <b>${meta.status}</b></span>
+      <span class="badge">Version <b>${escapeHtml(meta.version)}</b></span>
+      <span class="badge">Status <b>${escapeHtml(meta.status)}</b></span>
       <span class="badge">Sections <b>${toc.length}</b></span>
-      <span class="badge">Generated <b>${meta.date}</b></span>
+      <span class="badge">Updated <b>${escapeHtml(meta.updated)}</b></span>
+      <span class="badge">Changes marked <b>${meta.changed}</b></span>
+      <span class="badge">Open for review <b>${meta.open}</b></span>
     </div>
+    <p class="legend"><span class="rv chg">v${escapeHtml(meta.version)}</span> changed in this version &middot; <span class="rv open">review</span> open decision &middot; yellow callouts are new or rewritten passages &middot; a yellow dot in the contents marks a section with either</p>
     <p class="backlink" style="margin-top:14px">Companion to the <a href="index.html">label management digest</a> &middot; source of truth is <code style="font-size:11.5px">docs/labelling-contract.md</code></p>
   </div>
 </header>
@@ -268,7 +331,7 @@ function page(body, toc, meta) {
   <nav class="toc"><div class="lbl">Contents</div>${nav}</nav>
   <main>${body}
     <footer>
-      <p><b>This page is generated.</b> Edit <code>docs/labelling-contract.md</code> and run <code>node tools/build-contract.js</code>. Do not edit <code>contract.html</code> by hand.</p>
+      <p><b>This page is generated.</b> Edit <code>docs/labelling-contract.md</code> and run <code>node tools/build-contract.js</code>; <code>--check</code> reports whether this page is stale. Do not edit <code>contract.html</code> by hand.</p>
       <p>Platform limits quoted here were accurate when written and change between releases. The accompanying <a href="index.html">digest</a> links every underlying Grafana Labs source document.</p>
     </footer>
   </main>
@@ -299,13 +362,28 @@ const { body, toc } = render(md);
 const title = (md.match(/^#\s+(.*)$/m) || [, 'Labelling Contract'])[1];
 const version = (md.match(/\*\*Version\*\*\s*([^\s·*]+)/) || [, '0.1'])[1];
 const status = (md.match(/\*\*Status\*\*\s*([^·*]+)/) || [, 'draft'])[1].trim();
+const updated = (md.match(/\*\*Updated\*\*\s*(\d{4}-\d{2}-\d{2})/) || [])[1];
+if (!updated) throw new Error('missing "**Updated** YYYY-MM-DD" in the version line');
 
+const count = re => (body.match(re) || []).length;
 const out = page(body, toc, {
   title,
   version,
   status,
-  date: new Date().toISOString().slice(0, 10),
+  updated,
+  changed: count(/class="rv chg"/g) + count(/<blockquote class="review">/g),
+  open: count(/class="rv open"/g),
 });
+
+if (process.argv.includes('--check')) {
+  const current = fs.existsSync(OUT) ? fs.readFileSync(OUT, 'utf8') : '';
+  if (current !== out) {
+    console.error('contract.html is out of date: run node tools/build-contract.js');
+    process.exit(1);
+  }
+  console.log('contract.html is up to date');
+  process.exit(0);
+}
 
 fs.writeFileSync(OUT, out);
 
@@ -314,4 +392,6 @@ console.log('output   :', path.relative(ROOT, OUT), '(' + out.length + ' bytes)'
 console.log('sections :', toc.length);
 console.log('tables   :', (out.match(/<table>/g) || []).length);
 console.log('code     :', (out.match(/<pre class="code"/g) || []).length);
-console.log('quotes   :', (out.match(/<blockquote>/g) || []).length);
+console.log('quotes   :', (out.match(/<blockquote[ >]/g) || []).length);
+console.log('changed  :', count(/class="rv chg"/g), 'tags,', count(/<blockquote class="review">/g), 'callouts');
+console.log('open     :', count(/class="rv open"/g), 'review tags');

@@ -3,12 +3,12 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Observability Labelling & Correlation Contract</title>
+<title>Observability Labelling &amp; Correlation Contract</title>
 <style>
   :root{
     --bg:#0b0c0e; --card:#181b20; --card2:#1f232a; --line:#2b3038;
     --text:#e6e9ef; --muted:#9aa4b2; --dim:#6b7683;
-    --orange:#ff6b35; --orange-dim:#ff8c5a; --blue:#5794f2; --red:#f2596a; --green:#56c46b;
+    --orange:#ff6b35; --orange-dim:#ff8c5a; --blue:#5794f2; --red:#f2596a; --green:#56c46b; --yellow:#f2cc0c;
   }
   *{box-sizing:border-box}
   html{scroll-behavior:smooth}
@@ -70,6 +70,16 @@
     border-left:3px solid var(--orange);border-radius:0 8px 8px 0;color:#e2e6ed;max-width:86ch}
   blockquote p{margin:0}
 
+  /* Review highlighting: yellow = changed in this version, red = open decision. */
+  blockquote.review{background:rgba(242,204,12,.07);border-left-color:var(--yellow)}
+  .rv{display:inline-block;font-size:10.5px;font-weight:700;letter-spacing:.05em;text-transform:uppercase;
+    border-radius:4px;padding:0 6px;margin:0 2px;vertical-align:1px;line-height:1.6}
+  .rv.chg{background:rgba(242,204,12,.16);color:#e3c43a}
+  .rv.open{background:rgba(242,89,106,.18);color:#f5818d}
+  nav.toc .dot{display:inline-block;width:6px;height:6px;border-radius:50%;background:var(--yellow);
+    margin-left:7px;vertical-align:2px}
+  .legend{font-size:12.5px;color:var(--dim);margin-top:10px}
+
   footer{border-top:1px solid var(--line);margin-top:54px;padding-top:20px;color:var(--dim);font-size:12.5px}
   footer p{margin:0 0 7px;max-width:92ch}
 
@@ -80,7 +90,13 @@
   }
   @media print{
     body{background:#fff;color:#111}
-    nav.toc,header.top{display:none}
+    nav.toc,.backlink{display:none}
+    header.top{background:none;border-left:4px solid #999;padding:0 0 14px 14px;margin-bottom:10px}
+    header.top h1{color:#111}
+    .badge{border-color:#bbb;color:#333;background:none}
+    .badge b{color:#111}
+    .rv{background:none!important;border:1px solid #888;color:#111!important}
+    blockquote,blockquote.review{background:none;color:#111;border-left-color:#888}
     .shell{display:block;padding:0}
     main p,main li,td{color:#222}
     pre.code,code{background:#f5f5f5;color:#111;border-color:#ddd}
@@ -92,32 +108,39 @@
 <header class="top">
   <div class="in">
     <div class="eyebrow">Observability Programme</div>
-    <h1>Observability Labelling & Correlation Contract</h1>
+    <h1>Observability Labelling &amp; Correlation Contract</h1>
     <div class="badges">
-      <span class="badge">Version <b>0.1</b></span>
+      <span class="badge">Version <b>0.2</b></span>
       <span class="badge">Status <b>proposal</b></span>
-      <span class="badge">Sections <b>16</b></span>
-      <span class="badge">Generated <b>2026-09-23</b></span>
+      <span class="badge">Sections <b>20</b></span>
+      <span class="badge">Updated <b>2026-09-24</b></span>
+      <span class="badge">Changes marked <b>61</b></span>
+      <span class="badge">Open for review <b>20</b></span>
     </div>
+    <p class="legend"><span class="rv chg">v0.2</span> changed in this version &middot; <span class="rv open">review</span> open decision &middot; yellow callouts are new or rewritten passages &middot; a yellow dot in the contents marks a section with either</p>
     <p class="backlink" style="margin-top:14px">Companion to the <a href="index.html">label management digest</a> &middot; source of truth is <code style="font-size:11.5px">docs/labelling-contract.md</code></p>
   </div>
 </header>
 
 <div class="shell">
-  <nav class="toc"><div class="lbl">Contents</div><a href="#1-why-a-contract-rather-than-a-style-guide">1. Why a contract rather than a style guide</a><a href="#2-decisions-recorded">2. Decisions recorded</a><a href="#3-identity-model">3. Identity model</a><a href="#4-naming-rules-for-service_name">4. Naming rules for service_name</a><a href="#5-the-label-tiers">5. The label tiers</a><a href="#6-why-job-cannot-be-the-service-key">6. Why job cannot be the service key</a><a href="#7-cost-attribution-design">7. Cost attribution design</a><a href="#8-registry-generated-service_info-series">8. Registry-generated service_info series</a><a href="#9-injection-rules-per-category">9. Injection rules per category</a><a href="#10-correlation-strategy">10. Correlation strategy</a><a href="#11-multi-stack-implications">11. Multi-stack implications</a><a href="#12-conformance-and-measurement">12. Conformance and measurement</a><a href="#13-governance">13. Governance</a><a href="#14-anti-patterns">14. Anti-patterns</a><a href="#15-open-decisions">15. Open decisions</a><a href="#16-reference-platform-limits">16. Reference: platform limits</a></nav>
+  <nav class="toc"><div class="lbl">Contents</div><a href="#1-why-a-contract-rather-than-a-style-guide">1. Why a contract rather than a style guide<span class="dot" title="Contains v0.2 changes or open review items"></span></a><a href="#2-decisions-recorded">2. Decisions recorded<span class="dot" title="Contains v0.2 changes or open review items"></span></a><a href="#3-identity-model">3. Identity model</a><a href="#4-naming-rules-for-service_name">4. Naming rules for service_name<span class="dot" title="Contains v0.2 changes or open review items"></span></a><a href="#5-the-label-tiers">5. The label tiers<span class="dot" title="Contains v0.2 changes or open review items"></span></a><a href="#6-why-job-cannot-be-the-service-key">6. Why job cannot be the service key</a><a href="#7-cost-attribution-design">7. Cost attribution design<span class="dot" title="Contains v0.2 changes or open review items"></span></a><a href="#8-registry-generated-service_info-series">8. Registry-generated service_info series<span class="dot" title="Contains v0.2 changes or open review items"></span></a><a href="#9-traces">9. Traces<span class="dot" title="Contains v0.2 changes or open review items"></span></a><a href="#10-label-lifecycle">10. Label lifecycle<span class="dot" title="Contains v0.2 changes or open review items"></span></a><a href="#11-pipeline-capabilities">11. Pipeline capabilities<span class="dot" title="Contains v0.2 changes or open review items"></span></a><a href="#12-injection-rules-per-category">12. Injection rules per category<span class="dot" title="Contains v0.2 changes or open review items"></span></a><a href="#13-correlation-strategy">13. Correlation strategy<span class="dot" title="Contains v0.2 changes or open review items"></span></a><a href="#14-multi-stack-implications">14. Multi-stack implications<span class="dot" title="Contains v0.2 changes or open review items"></span></a><a href="#15-conformance-and-measurement">15. Conformance and measurement<span class="dot" title="Contains v0.2 changes or open review items"></span></a><a href="#16-governance">16. Governance<span class="dot" title="Contains v0.2 changes or open review items"></span></a><a href="#17-anti-patterns">17. Anti-patterns<span class="dot" title="Contains v0.2 changes or open review items"></span></a><a href="#18-open-decisions">18. Open decisions<span class="dot" title="Contains v0.2 changes or open review items"></span></a><a href="#19-reference-platform-limits">19. Reference: platform limits<span class="dot" title="Contains v0.2 changes or open review items"></span></a><a href="#20-changes-in-v02">20. Changes in v0.2<span class="dot" title="Contains v0.2 changes or open review items"></span></a></nav>
   <main><p>This document defines the label keys, allowed values and injection rules that let telemetry from four structurally different application categories be queried, correlated and costed as one estate.</p>
-<p>It is a contract, not a guideline: the Tier 1 keys are mandatory, and conformance is measured (see <a href="#12-conformance-and-measurement">section 12</a>).</p>
+<p>It is a contract, not a guideline: the Tier 1 keys are mandatory, and conformance is measured (see <a href="#15-conformance-and-measurement">section 15</a>).</p>
+<blockquote class="review"><strong>Added in v0.2 — how to review this version.</strong> v0.2 applies the review of v0.1. Every change is marked so it can be checked before it is accepted. Callouts like this one mark new or rewritten passages. A <code>**[v0.2]**</code> tag marks a changed row or list item. A <code>**[review]**</code> tag marks a point that is still open for the owner's decision and must not be treated as settled. <a href="#20-changes-in-v02">Section 20</a> lists every change in one place.</blockquote>
 <hr>
 <h2 id="1-why-a-contract-rather-than-a-style-guide">1. Why a contract rather than a style guide <a class="anchor" href="#1-why-a-contract-rather-than-a-style-guide">#</a></h2>
 <p>A conventional labelling standard assumes someone can act on it in application code. For three of our four categories, nobody can. The contract therefore separates <em>what the labels must be</em> from <em>where they get applied</em>.</p>
-<div class="tw"><table><thead><tr><th>Artifact</th><th>Contents</th><th>Owner</th><th>Location</th></tr></thead><tbody><tr><td><strong>Contract</strong> (this document)</td><td>Label keys, allowed values, mandatory sets, forbidden keys</td><td>Observability/Platform</td><td><code>docs/labelling-contract.md</code></td></tr><tr><td><strong>Registry</strong></td><td>Mapping of each telemetry source to its service, application, team, tier</td><td>Service owners, via PR</td><td><code>registry/services.yaml</code></td></tr></tbody></table></div>
+<div class="tw"><table><thead><tr><th>Artifact</th><th>Contents</th><th>Owner</th><th>Location</th></tr></thead><tbody><tr><td><strong>Contract</strong> (this document)</td><td>Label keys, allowed values, mandatory sets, restricted keys</td><td>Observability/Platform</td><td><code>docs/labelling-contract.md</code></td></tr><tr><td><strong>Registry</strong></td><td>Mapping of each telemetry source to its service, application, team, tier</td><td>Platform team, maintained by hand <span class="rv chg">v0.2</span></td><td>Platform team inventory; format to be agreed <span class="rv chg">v0.2</span></td></tr></tbody></table></div>
 <p>For category 1 the contract is satisfied at instrumentation time. For categories 2, 3 and 4 it is satisfied in the collection pipeline, from registry data. The same labels arrive in Grafana Cloud either way, which is what makes a single view possible.</p>
-<p><strong>Single enforcement point.</strong> Every path terminates in Grafana Alloy, so <code>prometheus.relabel</code> and <code>loki.relabel</code> are where the contract becomes real. Nothing reaches Grafana Cloud without traversing them.</p>
+<p><strong>Primary enforcement point.</strong> <span class="rv chg">v0.2</span> Most paths terminate in Grafana Alloy, so the Alloy relabel and processing components are where the contract becomes real for those paths. Section 10 shows where each label is set, changed or dropped, and section 11 lists what Alloy can and cannot do.</p>
+<blockquote class="review"><strong>Changed in v0.2 — for review.</strong> v0.1 said nothing reaches Grafana Cloud without passing through Alloy. That is not true. These paths bypass our Alloy entirely: Synthetic Monitoring checks (they run on Grafana probes), k6 test runs, Faro frontend telemetry (sent straight to the Grafana collector endpoint), and any Grafana-hosted integration or cloud-provider connection that Grafana collects directly. Each of these must be labelled in its own product configuration, using the same values from the registry.</blockquote>
+<blockquote class="review"><strong>Added in v0.2 — for review.</strong> The registry is, for now, a <strong>manual data inventory maintained by the Platform team</strong>. There is no generator: pipeline rules are written by hand from the inventory. This is workable at current scale, but the rules and the inventory will drift apart unless they are reconciled regularly (section 16).</blockquote>
 <h3 id="expectation-to-set-early">Expectation to set early</h3>
-<p>Grafana Cloud Application Observability only renders services that emit OpenTelemetry traces or span metrics, which in practice means category 1 only. The cross-domain view must therefore be a <strong>custom service overview dashboard driven by the Tier 1 labels</strong>, with drill-downs that differ per category. A single pane built on Application Observability alone would strand three quarters of the estate.</p>
+<p>Grafana Cloud Application Observability only renders services that emit OpenTelemetry traces or span metrics, which in practice means category 1 only. The cross-domain view must therefore be a <strong>custom service overview dashboard driven by the Tier 1 labels</strong>, with drill-downs that differ per category. A single pane built on Application Observability alone would leave three of our four categories out. <span class="rv chg">v0.2</span></p>
+<blockquote class="review"><strong>Added in v0.2 — for review.</strong> eBPF auto-instrumentation (Grafana Beyla, now contributed to OpenTelemetry as eBPF instrumentation) can produce traces and span metrics for HTTP and gRPC services without code changes. It could bring some category 3 applications into Application Observability. It has not been evaluated for our estate.</blockquote>
 <hr>
 <h2 id="2-decisions-recorded">2. Decisions recorded <a class="anchor" href="#2-decisions-recorded">#</a></h2>
-<div class="tw"><table><thead><tr><th>#</th><th>Decision</th><th>Outcome</th><th>Consequence</th></tr></thead><tbody><tr><td>1</td><td>Authority for <code>service_name</code></td><td><strong>ServiceNow CMDB + MEGA Hopex</strong></td><td>Names are derived, never invented locally. Requires a normalisation rule (section 4) and a sync process.</td></tr><tr><td>2</td><td>Cost attribution labels</td><td><strong><code>team</code> + <code>application</code></strong></td><td>Safe only if <code>team</code> is functionally dependent on <code>application</code> (section 7).</td></tr><tr><td>3</td><td>Number of stacks</td><td><strong>Several; minimum production and development</strong></td><td>Attribution is configured per stack. No native cross-stack rollup.</td></tr><tr><td>4</td><td>Environment values</td><td><strong>OPEN</strong> — starter enumeration proposed in section 5</td><td>Needs confirmation before v1.0.</td></tr><tr><td>5</td><td>Per-tenant SaaS breakdown</td><td><strong>Not required</strong></td><td>Tenant identifiers are forbidden as labels. Simplifies category 2 considerably.</td></tr><tr><td>6</td><td>PII review for SaaS exports</td><td><strong>Cyber security owns review</strong></td><td>Sign-off gate per source, plus a <code>data_class</code> label (section 5).</td></tr></tbody></table></div>
+<div class="tw"><table><thead><tr><th>#</th><th>Decision</th><th>Outcome</th><th>Consequence</th></tr></thead><tbody><tr><td>1</td><td>Authority for <code>service_name</code></td><td><strong>ServiceNow CMDB + MEGA Hopex</strong></td><td>Names are derived, never invented locally. Requires a normalisation rule (section 4) and a sync process.</td></tr><tr><td>2</td><td>Cost attribution labels</td><td><strong><code>team</code> + <code>application</code></strong></td><td>Safe only if <code>team</code> is functionally dependent on <code>application</code> (section 7).</td></tr><tr><td>3</td><td>Number of stacks</td><td><strong>Several; minimum production and development</strong></td><td>Attribution is configured per stack. No native cross-stack rollup.</td></tr><tr><td>4</td><td>Environment values</td><td><strong>OPEN</strong> — starter enumeration proposed in section 14</td><td>Needs confirmation before v1.0.</td></tr><tr><td>5</td><td>Per-tenant SaaS breakdown</td><td><strong>Not required</strong></td><td>Tenant identifiers are forbidden as labels. Simplifies category 2 considerably.</td></tr><tr><td>6</td><td>PII review for SaaS exports</td><td><strong>Cyber security owns review</strong></td><td>Sign-off gate per source. The accompanying <code>data_class</code> label is undecided. <span class="rv open">review</span></td></tr><tr><td>7</td><td>Traces</td><td><strong>In scope</strong> <span class="rv chg">v0.2</span></td><td>Tier 1 applies to traces as resource attributes (section 9).</td></tr><tr><td>8</td><td>Profiles</td><td><strong>Not yet in scope</strong> <span class="rv chg">v0.2</span></td><td>Pyroscope rules are kept for reference only. Revisit before onboarding any profiles.</td></tr><tr><td>9</td><td>Registry</td><td><strong>Manual inventory, Platform team</strong> <span class="rv chg">v0.2</span></td><td>No generator. Relabel rules are written by hand from the inventory.</td></tr><tr><td>10</td><td>Kubernetes</td><td><strong>Not targeted</strong> <span class="rv chg">v0.2</span></td><td><code>cluster</code>, <code>namespace</code> and <code>pod</code> are optional. They become required on logs if Kubernetes Monitoring is ever adopted.</td></tr></tbody></table></div>
 <hr>
 <h2 id="3-identity-model">3. Identity model <a class="anchor" href="#3-identity-model">#</a></h2>
 <p>Three nested levels of identity. Choosing the wrong grain for each is the most common cause of both broken correlation and cost-attribution failure.</p>
@@ -128,14 +151,20 @@
 <h2 id="4-naming-rules-for-service_name">4. Naming rules for <code>service_name</code> <a class="anchor" href="#4-naming-rules-for-service_name">#</a></h2>
 <p>CMDB CI names are not label-safe. Derive the label deterministically:</p>
 <pre class="code" data-lang="text">1. lowercase the CMDB CI name
-2. strip environment suffixes and parenthetical qualifiers
-3. replace any run of characters outside [a-z0-9] with a single "-"
-4. collapse repeated "-", then trim leading and trailing "-"
-5. truncate to 63 characters
+2. remove parenthetical qualifiers, for example "(prod)"
+3. remove one trailing environment word from this fixed list:
+     prod production dr stg staging uat test dev development sandbox
+4. replace any run of characters outside [a-z0-9] with a single "-"
+5. trim leading and trailing "-"
+6. if the result starts with a digit, prefix "svc-"
+7. truncate to 63 characters, then trim any trailing "-" again
 
 Result must match:  ^[a-z][a-z0-9-]{1,62}$</pre>
-<div class="tw"><table><thead><tr><th>CMDB CI name</th><th><code>service_name</code></th><th>Note</th></tr></thead><tbody><tr><td><code>Checkout API (PROD)</code></td><td><code>checkout-api</code></td><td>Environment lives in <code>deployment_environment</code>, never the name</td></tr><tr><td><code>SAP_S4HANA Core</code></td><td><code>sap-s4hana-core</code></td><td>Underscores normalised</td></tr><tr><td><code>Payments/Ledger Service</code></td><td><code>payments-ledger-service</code></td><td>Slash removed, see warning below</td></tr><tr><td><code>Salesforce CRM</code></td><td><code>salesforce-crm</code></td><td>Category 2 sources are named the same way</td></tr></tbody></table></div>
+<blockquote class="review"><strong>Changed in v0.2 — for review.</strong> Three defects in the v0.1 algorithm are fixed. "Strip environment suffixes" was a judgement call, so step 3 now uses a fixed word list. A name starting with a digit failed the result pattern, so step 6 adds a prefix; the <code>svc-</code> prefix is a proposal. Truncating after trimming could leave a trailing "-", so step 7 trims again. Non-ASCII characters are replaced by step 4, not transliterated (for example, "Café" becomes <code>caf</code>), so check the results for collisions.</blockquote>
+<div class="tw"><table><thead><tr><th>CMDB CI name</th><th><code>service_name</code></th><th>Note</th></tr></thead><tbody><tr><td><code>Checkout API (PROD)</code></td><td><code>checkout-api</code></td><td>Environment lives in <code>deployment_environment</code>, never the name</td></tr><tr><td><code>SAP_S4HANA Core</code></td><td><code>sap-s4hana-core</code></td><td>Underscores normalised</td></tr><tr><td><code>Payments/Ledger Service</code></td><td><code>payments-ledger-service</code></td><td>Slash removed, see warning below</td></tr><tr><td><code>Salesforce CRM</code></td><td><code>salesforce-crm</code></td><td>Category 2 sources are named the same way</td></tr><tr><td><code>3M Portal</code></td><td><code>svc-3m-portal</code></td><td>Leading digit prefixed <span class="rv chg">v0.2</span></td></tr></tbody></table></div>
 <p><strong>Never use a slash in <code>service_name</code> or <code>service_namespace</code>.</strong> Application Observability treats the slash as the namespace separator and its grouping and filtering features break.</p>
+<h3 id="stability-rule">Stability rule</h3>
+<blockquote class="review"><strong>Added in v0.2 — for review.</strong> A <code>service_name</code> is fixed when its registry entry is created. Later changes to the CMDB CI name or the Hopex short code do <strong>not</strong> change it; the inventory records the name it was derived from. Changing a <code>service_name</code> is a deliberate migration (section 16), because it breaks dashboards, alert routing and cost history at the same time.</blockquote>
 <h3 id="collision-policy">Collision policy</h3>
 <p>If two CIs normalise to the same value, append the Hopex application short code (<code>checkout-api-shop</code>, <code>checkout-api-ops</code>) and record both in the registry. Never auto-suffix a number; it is meaningless at query time.</p>
 <h3 id="identifiers-that-stay-out-of-the-labels">Identifiers that stay out of the labels</h3>
@@ -144,19 +173,30 @@ Result must match:  ^[a-z][a-z0-9-]{1,62}$</pre>
 <h2 id="5-the-label-tiers">5. The label tiers <a class="anchor" href="#5-the-label-tiers">#</a></h2>
 <h3 id="tier-1-mandatory-on-every-signal-from-every-category">Tier 1 — mandatory on every signal, from every category</h3>
 <div class="tw"><table><thead><tr><th>Key</th><th>Example</th><th>Purpose</th><th>Distinct values</th></tr></thead><tbody><tr><td><code>service_name</code></td><td><code>checkout-api</code></td><td>Primary correlation key across all signals</td><td>hundreds</td></tr><tr><td><code>service_namespace</code></td><td><code>shop</code></td><td>Domain or bounded context</td><td>tens</td></tr><tr><td><code>application</code></td><td><code>shop-checkout</code></td><td>Hopex application; cost attribution</td><td>tens to low hundreds</td></tr><tr><td><code>deployment_environment</code></td><td><code>production</code></td><td>Environment filter; required for Application Observability baselines</td><td>4 to 7</td></tr><tr><td><code>team</code></td><td><code>checkout</code></td><td>Alert routing and cost attribution</td><td>tens</td></tr><tr><td><code>tier</code></td><td><code>tier1</code></td><td>Criticality; drives alert severity and cost conversations</td><td>3</td></tr><tr><td><code>source_class</code></td><td><code>owned</code></td><td>Which of the four categories this came from</td><td>4</td></tr></tbody></table></div>
+<p>"Every signal" means every metric series, every log stream and every trace. Traces carry these keys as resource attributes, not labels; section 9 gives the attribute names. <span class="rv chg">v0.2</span></p>
 <p><code>source_class</code> is the least obvious and among the most useful. It lets us measure conformance per category, and lets a dashboard know which signals to expect before it renders an empty panel.</p>
 <p>Allowed values:</p>
 <pre class="code" data-lang="text">tier          tier1 | tier2 | tier3
-source_class  owned | saas | hosted-cots | other</pre>
+source_class  owned | saas | hosted-cots | other
+
+Sentinels, set only by the default rule (section 12, category 4):
+service_name  unknown_service
+team          unassigned
+source_class  unknown</pre>
+<blockquote class="review"><strong>Added in v0.2 — for review.</strong> The sentinel values are new. In v0.1 the default rule set a missing <code>source_class</code> to <code>other</code>, which is also a legitimate value, so defaulted telemetry was indistinguishable from genuine category 4 and the conformance figure hid the defect it was meant to measure. The <code>service_name</code> default changes from <code>unknown</code> to <code>unknown_service</code>, the value Loki already uses, so one sentinel covers both our rule and Loki's fallback.</blockquote>
 <h3 id="tier-2-conditional-where-meaningful">Tier 2 — conditional, where meaningful</h3>
-<div class="tw"><table><thead><tr><th>Key</th><th>When</th><th>Note</th></tr></thead><tbody><tr><td><code>instance</code></td><td>Any host, process or endpoint</td><td>Must be identical across metrics and logs for the same target</td></tr><tr><td><code>service_version</code></td><td>Category 1</td><td>Answers "did the release cause this"</td></tr><tr><td><code>cluster</code></td><td>Kubernetes</td><td>Reserved by Kubernetes tooling; do not reuse for other groupings</td></tr><tr><td><code>kafka_cluster</code></td><td>Kafka</td><td>Deliberately distinct from <code>cluster</code></td></tr><tr><td><code>region</code></td><td>Multi-region</td><td>AWS region</td></tr><tr><td><code>provider</code></td><td>Mixed hosting</td><td><code>aws</code>, <code>saas</code>, <code>on-prem</code></td></tr><tr><td><code>data_class</code></td><td>Recommended everywhere</td><td><code>public</code>, <code>internal</code>, <code>confidential</code>, <code>restricted</code>. Supports Cyber review and may support label-based access control; confirm availability on our plan before relying on it for access.</td></tr><tr><td><code>job</code></td><td>Set by integrations</td><td><strong>Not ours to define</strong> — see section 6</td></tr></tbody></table></div>
+<div class="tw"><table><thead><tr><th>Key</th><th>When</th><th>Note</th></tr></thead><tbody><tr><td><code>instance</code></td><td>Any host, process or endpoint</td><td>Must be identical across metrics and logs for the same target</td></tr><tr><td><code>service_version</code></td><td>Category 1</td><td>Answers "did the release cause this"</td></tr><tr><td><code>region</code></td><td>Multi-region</td><td>AWS region</td></tr><tr><td><code>provider</code></td><td>Mixed hosting</td><td><code>aws</code>, <code>saas</code>, <code>on-prem</code></td></tr><tr><td><code>kafka_cluster</code></td><td>Kafka</td><td>Deliberately distinct from <code>cluster</code></td></tr><tr><td><code>data_class</code></td><td><strong>Status undecided</strong> <span class="rv open">review</span></td><td>Proposed values <code>public</code>, <code>internal</code>, <code>confidential</code>, <code>restricted</code>. Would support Cyber review and possibly label-based access control; confirm availability on our plan before relying on it for access.</td></tr><tr><td><code>cluster</code>, <code>namespace</code>, <code>pod</code></td><td>Kubernetes only — <strong>optional</strong> <span class="rv chg">v0.2</span></td><td>Kubernetes is not targeted in our estate. If Kubernetes Monitoring is ever adopted, all three become <strong>required on pod logs</strong>, because its logs-to-workload navigation depends on them. <code>cluster</code> is reserved by Kubernetes tooling; do not reuse it for other groupings.</td></tr><tr><td><code>job</code></td><td>Set by integrations</td><td><strong>Not ours to define</strong> — see section 6</td></tr></tbody></table></div>
+<blockquote class="review"><strong>Added in v0.2 — for review: <code>data_class</code>.</strong> v0.1 was inconsistent: this table called <code>data_class</code> recommended, while the onboarding gate and <code>service_info</code> treated it as mandatory. Its status is now explicitly open. Decide one of: (a) mandatory — move it to Tier 1 and keep the onboarding gate; (b) recommended — keep it here and drop it from the gate; (c) dropped — Cyber's review is recorded in the inventory only. Until decided, set it where known and do not block onboarding on it. It also costs one label slot, which matters on sources near the Loki limit (see the label budget below).</blockquote>
+<blockquote class="review"><strong>Changed in v0.2 — for review: <code>pod</code>.</strong> v0.1 listed <code>pod</code> in Tier 3 as never a label. That contradicted Kubernetes Monitoring, which requires it on pod logs. Since we do not target Kubernetes, it is now optional.</blockquote>
+<p><code>provider</code> overlaps with <code>source_class</code> (<code>saas</code> appears in both), and none of our four categories is on-premises. Consider dropping it. <span class="rv open">review</span></p>
 <h3 id="tier-3-never-a-label">Tier 3 — never a label</h3>
 <p>These belong in Loki structured metadata, span attributes or the log line. They are unbounded or short-lived, and as labels they would fragment streams and inflate series.</p>
 <pre class="code" data-lang="text">trace_id   request_id   session_id   user_id   tenant_id
-pod        container_id   query_id    order_id   ip_address</pre>
+container_id   query_id    order_id   ip_address</pre>
 <p>Per decision 5, tenant identifiers are not required for reporting. If a tenant value is ever needed for debugging, it goes to structured metadata.</p>
-<h3 id="forbidden-as-label-keys">Forbidden as label keys</h3>
-<pre class="code" data-lang="text">Prohibited for cost attribution by Grafana Cloud:
+<h3 id="restricted-keys">Restricted keys</h3>
+<blockquote class="review"><strong>Changed in v0.2 — for review.</strong> v0.1 titled this "Forbidden as label keys", but <code>job</code> and <code>instance</code> are listed here and are also Tier 2 labels. These keys are restricted in specific ways, not forbidden outright.</blockquote>
+<pre class="code" data-lang="text">Prohibited as cost-attribution labels by Grafana Cloud:
   id  monetary  org_id  stack_id  instance  job  tenant
   mimir_namespace  loki_namespace  loki_cluster
   reason  tracker  retention_hours  anything starting __
@@ -165,6 +205,10 @@ Reserved by Synthetic Monitoring:      job  instance  probe
 Reserved by Grafana Alerting:          alertname  grafana_folder
 Managed by Database Observability:     server_id  op</pre>
 <p>Note that <code>job</code> and <code>instance</code> are prohibited <em>as attribution labels</em> while remaining essential operational labels. This is precisely why neither can serve as our identity key.</p>
+<h3 id="label-budget-per-log-stream">Label budget per log stream</h3>
+<blockquote class="review"><strong>Added in v0.2 — for review.</strong> Loki indexes at most 15 labels per stream and rejects streams with more at ingest. Tier 1 alone uses 7. Some integrations need many of the rest.</blockquote>
+<div class="tw"><table><thead><tr><th>Log source</th><th>Integration-required labels</th><th>Tier 1 not already counted</th><th>Tier 2 in use</th><th>Total</th><th>Against 15</th></tr></thead><tbody><tr><td>Category 2 SaaS export</td><td>none</td><td>7</td><td><code>data_class</code></td><td>8</td><td>7 spare</td></tr><tr><td>Category 3 Linux host (Linux Server integration)</td><td>9: <code>job</code>, <code>instance</code>, <code>unit</code>, <code>boot_id</code>, <code>transport</code>, <code>level</code>, <code>service_name</code>, <code>name</code>, <code>source</code></td><td>6</td><td><code>data_class</code></td><td>16</td><td><strong>1 over</strong></td></tr><tr><td>Category 1 OTLP logs</td><td>Loki's promoted resource attributes</td><td>varies</td><td>varies</td><td>count on real streams</td><td>verify</td></tr><tr><td>Synthetic Monitoring</td><td>added by the product, plus up to 10 custom</td><td>varies</td><td>none</td><td>count on real streams</td><td>verify</td></tr></tbody></table></div>
+<p>When a source is over budget, keep in this order: integration-required labels, then <code>service_name</code> and <code>deployment_environment</code>, then <code>team</code> and <code>application</code>. Move <code>tier</code>, <code>source_class</code> and <code>data_class</code> for that source to structured metadata, and record the exception. Conformance reporting for that source must then read structured metadata. <span class="rv open">review</span></p>
 <hr>
 <h2 id="6-why-job-cannot-be-the-service-key">6. Why <code>job</code> cannot be the service key <a class="anchor" href="#6-why-job-cannot-be-the-service-key">#</a></h2>
 <p>Grafana Cloud integrations hard-code <code>job</code>, and their dashboards break if the value differs:</p>
@@ -174,6 +218,7 @@ Managed by Database Observability:     server_id  op</pre>
 <h2 id="7-cost-attribution-design">7. Cost attribution design <a class="anchor" href="#7-cost-attribution-design">#</a></h2>
 <p>Grafana Cloud permits <strong>2 attribution labels</strong> with a combined maximum of <strong>1,000 unique combinations</strong>, enforced at configuration time, computed <strong>per stack</strong>, and <strong>never backfilled</strong>.</p>
 <p>Chosen labels: <strong><code>team</code> + <code>application</code></strong>.</p>
+<p>Use the same key strings on every signal: labels on metrics and logs, resource attributes on traces (section 9). Then one name covers all three, and the Label Name alias in the attribution setup is not needed. <span class="rv chg">v0.2</span></p>
 <h3 id="the-cardinality-question-and-why-it-is-fine">The cardinality question, and why it is fine</h3>
 <p>The naive worst case is the product of both label cardinalities, which would be alarming:</p>
 <pre class="code" data-lang="text">25 teams x 120 applications = 3,000 combinations   -&gt; exceeds the 1,000 cap</pre>
@@ -188,6 +233,7 @@ Managed by Database Observability:     server_id  op</pre>
   count by (team, application) (service_info)
 )</pre>
 <p>Track it, and alert at 80% of the cap (800) to leave room before configuration is refused.</p>
+<blockquote class="review"><strong>Added in v0.2 — for review.</strong> This query counts what the inventory <em>says</em>, not what telemetry actually <em>carries</em>. Typos, the <code>unassigned</code> sentinel and hand-written rules that have drifted will not show up in it. Compare it regularly with the combinations and the unattributed share that Cost Management reports. It is also unclear what Grafana Cloud does if the real count passes 1,000 <em>after</em> attribution is configured; check with Grafana before relying on the 800 alert as the safety margin. <span class="rv open">review</span></blockquote>
 <h3 id="enable-it-now">Enable it now</h3>
 <p>Cost attribution begins collecting only from the moment it is switched on, and historical data cannot be regenerated. Enable it on both stacks during Phase 1 even with imperfect labels; an incomplete report beats no report, and the gap cannot be recovered later.</p>
 <hr>
@@ -198,8 +244,88 @@ Managed by Database Observability:     server_id  op</pre>
 <p>It gives us:</p>
 <ul><li><strong>Dashboard variables</strong> — populate service and application pickers from the registry, not from whatever happens to be reporting</li><li><strong>Coverage detection</strong> — a service present in <code>service_info</code> but with no telemetry for 24h is either broken or never onboarded</li><li><strong>Attribution counting</strong> — the query in section 7</li><li><strong>A guaranteed join target</strong> — one series carrying all Tier 1 labels exists for every service regardless of category</li></ul>
 <p>Cost is a few hundred series per stack, which is negligible.</p>
+<blockquote class="review"><strong>Added in v0.2 — for review.</strong> With a manual inventory there is nothing to generate these series automatically. One conceptual option: the Platform team keeps a static file of <code>service_info</code> lines in Prometheus text format, and Alloy exposes it through the node exporter textfile collector, one file per stack. Each stack should receive only its own environments (section 14). <code>data_class</code> stays in the series only if decision 6 keeps it. The mechanism is not decided. <span class="rv open">review</span></blockquote>
 <hr>
-<h2 id="9-injection-rules-per-category">9. Injection rules per category <a class="anchor" href="#9-injection-rules-per-category">#</a></h2>
+<h2 id="9-traces">9. Traces <a class="anchor" href="#9-traces">#</a></h2>
+<blockquote class="review"><strong>Added in v0.2 — for review.</strong> This section is new; traces are in scope (decision 7).</blockquote>
+<p>Traces have no labels. They carry <strong>resource attributes</strong>, which describe the process that produced the spans, and <strong>span attributes</strong>, which describe one operation. Tier 1 identity belongs on resource attributes, never on span attributes: it is one value per service, it applies to every span that service emits, and it is what TraceQL <code>resource.</code> queries, span metrics and cost attribution read.</p>
+<h3 id="attribute-names">Attribute names</h3>
+<div class="tw"><table><thead><tr><th>Tier 1 key</th><th>Trace resource attribute</th><th>Set where</th><th>Standard or custom</th></tr></thead><tbody><tr><td><code>service_name</code></td><td><code>service.name</code></td><td>SDK, <code>OTEL_RESOURCE_ATTRIBUTES</code></td><td>OpenTelemetry standard</td></tr><tr><td><code>service_namespace</code></td><td><code>service.namespace</code></td><td>SDK</td><td>OpenTelemetry standard</td></tr><tr><td><code>deployment_environment</code></td><td><code>deployment.environment.name</code></td><td>SDK</td><td>OpenTelemetry standard</td></tr><tr><td><code>application</code></td><td><code>application</code></td><td>Alloy, from the inventory</td><td>Custom</td></tr><tr><td><code>team</code></td><td><code>team</code></td><td>Alloy, from the inventory</td><td>Custom</td></tr><tr><td><code>tier</code></td><td><code>tier</code></td><td>Alloy, from the inventory</td><td>Custom</td></tr><tr><td><code>source_class</code></td><td><code>source_class</code></td><td>Alloy, from the inventory</td><td>Custom</td></tr><tr><td><code>service_version</code> (Tier 2)</td><td><code>service.version</code></td><td>SDK</td><td>OpenTelemetry standard</td></tr></tbody></table></div>
+<p><strong>Standard keys use OpenTelemetry's dotted names.</strong> Grafana Cloud converts them to the underscore label names when traces become span metrics or when logs arrive over OTLP, so <code>service.name</code> and <code>service_name</code> are the same identity.</p>
+<p><strong>Custom keys use the bare label name, with no prefix.</strong> OpenTelemetry has no standard attribute for team, application, tier or category. Its guidance is to prefix custom attributes with an organisation namespace (for example <code>&lt;org&gt;.team</code>) so they cannot clash with future standard names. We deliberately do not, because the conversion to labels turns dots into underscores: <code>&lt;org&gt;.team</code> would arrive as <code>&lt;org&gt;_team</code>, not <code>team</code>, and the single identity breaks. That would need a rename rule on every path and the Label Name alias in cost attribution. The trade-off is a small risk that OpenTelemetry later defines a clashing bare <code>team</code> or <code>application</code>; check at each OpenTelemetry upgrade. <span class="rv open">review</span></p>
+<p><strong>Never use the <code>service.</code> prefix for custom keys</strong> (<code>service.team</code>, for example). That namespace belongs to OpenTelemetry.</p>
+<h3 id="why-the-custom-keys-are-set-in-alloy-not-the-sdk">Why the custom keys are set in Alloy, not the SDK</h3>
+<p><code>team</code> is resolved from <code>application</code> (section 7). If each service sets its own <code>team</code> in code, the values drift away from the inventory and the attribution guarantee is lost. Services set only the standard keys; Alloy adds the rest, matching on <code>service.name</code>:</p>
+<pre class="code" data-lang="text">Conceptual pipeline, not working configuration:
+
+otelcol.receiver.otlp
+  -&gt; otelcol.processor.transform "identity"
+       for each inventory entry, one statement, written by hand:
+         where resource service.name == "checkout-api"
+           set resource application  = "shop-checkout"
+           set resource team         = "checkout"
+           set resource tier         = "tier1"
+           set resource source_class = "owned"
+       last, for anything not matched:
+         where resource team is missing  set resource team = "unassigned"
+  -&gt; otelcol.processor.batch
+  -&gt; otelcol.exporter.otlp  (Tempo, stack chosen by deployment.environment.name)</pre>
+<h3 id="points-to-verify-before-relying-on-this">Points to verify before relying on this</h3>
+<ul><li><strong>Span metrics.</strong> If span metrics should carry <code>team</code> and <code>application</code>, they must be added as dimensions in the metrics-generator. In Grafana Cloud this is managed configuration; confirm with Grafana how to add dimensions. They add little cardinality, because both keys follow from <code>service.name</code>. <span class="rv open">review</span></li><li><strong>Cost attribution for traces.</strong> Confirm that trace attribution can use the resource attributes <code>team</code> and <code>application</code> directly. <span class="rv open">review</span></li><li><strong>Personal data in spans.</strong> Span attributes such as URLs, query parameters or database statements can contain personal data. Redact in the same <code>transform</code> stage, before export.</li></ul>
+<hr>
+<h2 id="10-label-lifecycle">10. Label lifecycle <a class="anchor" href="#10-label-lifecycle">#</a></h2>
+<blockquote class="review"><strong>Added in v0.2 — for review.</strong> This section is new. It shows where each piece of identity is set, enriched, changed, dropped or passed through untouched, from source to query.</blockquote>
+<pre class="code" data-lang="text">  CAT 1 owned app       CAT 2 SaaS            CAT 3 COTS on EC2        CAT 4 other
+  OTel SDK sets         vendor API/export     exporter + log files     whatever arrives
+  service.* and         no agent possible     integration job
+  deployment.env.*
+        |                     |                      |                     |
+        +---------------------+----------+-----------+---------------------+
+                                         |
+ [A] COLLECT     Alloy: OTLP receiver, scrape, file tail, API pull
+                 PASS     everything as received
+                 SET      job, instance to the integration-required value      (cat 3)
+                 USE      __meta_* discovery labels, dropped automatically after
+                                         |
+ [B] ENRICH      Alloy relabel / transform, rules written by hand from inventory
+                 SET      service_name, service_namespace, deployment_environment (cat 2-4)
+                 COPY     service.* resource attributes onto metric series      (cat 1)
+                 ENRICH   application, team, tier, source_class, data_class     (all)
+                                         |
+ [C] CLEAN       Alloy relabel / loki.process / transform
+                 DROP     label keys: trace_id, request_id, user_id, tenant_id
+                 MOVE     trace_id, request_id to structured metadata           (logs)
+                 REDACT   personal data in log lines and span attributes
+                                         |
+ [D] DEFAULT     Alloy, applied last
+                 DEFAULT  service_name=unknown_service  team=unassigned  source_class=unknown
+                                         |
+ [E] ROUTE       Alloy writers
+                 ROUTE    by deployment_environment: production or development stack
+                                         |
+ ============ boundary: below this line we do not control the behaviour ============
+                                         |
+   BYPASS  Synthetic Monitoring, k6, Faro, Grafana-hosted integrations
+           labels set in each product's own config ------------------+
+                                         |                            |
+ [F] INGEST      Grafana Cloud    &lt;------------------------------------+
+                 CONVERT  OTLP metrics: resource attributes go to target_info;
+                          only job and instance become series labels
+                 DERIVE   job = service.namespace/service.name              (OTLP)
+                 DERIVE   Loki service_name when absent, else unknown_service
+                 REJECT   log streams over 15 labels; structured metadata over limits
+                                         |
+ [G] USE         dashboards, alerts, cost attribution (per stack, from enable date)
+                 JOIN     telemetry to service_info on service_name</pre>
+<p>What happens to each property at each stage. A dash means the stage leaves it alone.</p>
+<div class="tw"><table><thead><tr><th>Property</th><th>Origin</th><th>A Collect</th><th>B Enrich</th><th>C Clean</th><th>D Default</th><th>F Ingest</th></tr></thead><tbody><tr><td><code>service_name</code></td><td>SDK (cat 1); inventory (cat 2–4)</td><td>pass</td><td>set (cat 2–4); copy to metrics (cat 1)</td><td>—</td><td>default <code>unknown_service</code></td><td>Loki derives if absent</td></tr><tr><td><code>service_namespace</code></td><td>SDK (cat 1); inventory (cat 2–4)</td><td>pass</td><td>set; copy to metrics (cat 1)</td><td>—</td><td>—</td><td>part of derived <code>job</code></td></tr><tr><td><code>deployment_environment</code></td><td>SDK (cat 1); inventory (cat 2–4)</td><td>pass</td><td>set; copy to metrics (cat 1)</td><td>—</td><td>—</td><td>—</td></tr><tr><td><code>application</code>, <code>tier</code></td><td>inventory</td><td>—</td><td>enrich</td><td>—</td><td>—</td><td>—</td></tr><tr><td><code>team</code></td><td>inventory, via <code>application</code></td><td>—</td><td>enrich</td><td>—</td><td>default <code>unassigned</code></td><td>—</td></tr><tr><td><code>source_class</code></td><td>inventory</td><td>—</td><td>enrich</td><td>—</td><td>default <code>unknown</code></td><td>—</td></tr><tr><td><code>data_class</code> <span class="rv open">review</span></td><td>inventory</td><td>—</td><td>enrich</td><td>—</td><td>—</td><td>—</td></tr><tr><td><code>job</code></td><td>integration or OTLP</td><td>set (cat 3), else pass</td><td>never changed</td><td>—</td><td>—</td><td>derived for OTLP</td></tr><tr><td><code>instance</code></td><td>runtime or collector</td><td>set (cat 3), else pass</td><td>never changed</td><td>—</td><td>—</td><td>derived for OTLP</td></tr><tr><td><code>service_version</code></td><td>SDK</td><td>pass</td><td>—</td><td>—</td><td>—</td><td>—</td></tr><tr><td><code>cluster</code>, <code>namespace</code>, <code>pod</code></td><td>Kubernetes (optional)</td><td>pass if present</td><td>—</td><td>—</td><td>—</td><td>—</td></tr><tr><td><code>trace_id</code>, <code>request_id</code></td><td>application</td><td>pass</td><td>—</td><td>drop label; move to structured metadata</td><td>—</td><td>—</td></tr><tr><td><code>user_id</code>, <code>session_id</code>, <code>tenant_id</code></td><td>application or vendor</td><td>pass</td><td>—</td><td>drop label; structured metadata only if needed</td><td>—</td><td>—</td></tr><tr><td><code>cmdb_ci</code>, <code>hopex_id</code></td><td>inventory only</td><td>never enters the pipeline</td><td>—</td><td>—</td><td>—</td><td>—</td></tr><tr><td>Personal data in content</td><td>application or vendor</td><td>pass</td><td>—</td><td>redact</td><td>—</td><td>—</td></tr><tr><td><code>__meta_*</code>, <code>__*</code></td><td>Alloy discovery</td><td>used by <code>discovery.relabel</code></td><td>dropped automatically</td><td>—</td><td>—</td><td>—</td></tr></tbody></table></div>
+<hr>
+<h2 id="11-pipeline-capabilities">11. Pipeline capabilities <a class="anchor" href="#11-pipeline-capabilities">#</a></h2>
+<blockquote class="review"><strong>Added in v0.2 — for review.</strong> This section is new. It describes, at the conceptual level, what Alloy can and cannot do for this contract. It is not working configuration; confirm each capability against current Alloy documentation before building on it.</blockquote>
+<div class="tw"><table><thead><tr><th>Need</th><th>Possible</th><th>How, conceptually</th><th>Limits</th></tr></thead><tbody><tr><td>Add a fixed label to everything from one source</td><td>Yes</td><td>A relabel rule with a fixed replacement, in that source's pipeline</td><td>One pipeline per source</td></tr><tr><td>Look up <code>team</code> and <code>application</code> from <code>service_name</code></td><td>Yes, by hand</td><td>One conditional rule per inventory entry, matching on <code>service_name</code></td><td>No native lookup from a data file; rule count grows with the inventory. Check whether newer Alloy features can loop over a file. <span class="rv open">review</span></td></tr><tr><td>Set a default when a label is missing</td><td>Yes</td><td>Replace only where the current value is empty</td><td>Must run last</td></tr><tr><td>Drop a label key</td><td>Yes</td><td><code>labeldrop</code> or <code>labelkeep</code></td><td>Dropping every label drops the series or entry</td></tr><tr><td>Drop whole series or log entries</td><td>Yes</td><td><code>drop</code> or <code>keep</code> rules</td><td>Several <code>keep</code> rules combine as AND</td></tr><tr><td>Move a log label to structured metadata</td><td>Yes</td><td><code>loki.process</code> structured metadata stage</td><td>Per-line limits: 64 KB, 128 entries</td></tr><tr><td>Redact log content</td><td>Yes</td><td><code>loki.process</code> replace stage</td><td><code>loki.relabel</code> cannot read content</td></tr><tr><td>Set or change trace resource attributes</td><td>Yes</td><td><code>otelcol.processor.transform</code></td><td>Rules written by hand, as above</td></tr><tr><td>Redact span attributes</td><td>Yes</td><td><code>otelcol.processor.transform</code></td><td>Must run before export</td></tr><tr><td>Put OTel resource attributes on metric series</td><td>Yes</td><td>Copy them in the pipeline before export, or configure promotion in Grafana Cloud</td><td>Promotion options need verifying <span class="rv open">review</span></td></tr><tr><td>Route by environment to a stack</td><td>Yes</td><td>One writer per stack, with keep rules on <code>deployment_environment</code></td><td>Every path needs both writers</td></tr><tr><td>Keep <code>instance</code> identical on metrics and logs</td><td>Yes, by discipline</td><td>Set the same value in both pipelines</td><td>Nothing checks it automatically</td></tr><tr><td>Label telemetry that bypasses Alloy</td><td><strong>No</strong></td><td>Set labels in each product: check labels, k6 project labels, Faro metas</td><td>Limits differ per product (section 19)</td></tr><tr><td>Change data already stored</td><td><strong>No</strong></td><td>Not possible</td><td>Cost attribution is never backfilled</td></tr><tr><td>Use a log label to decide a metric label</td><td><strong>No</strong></td><td>Each signal has its own components; give each signal the same rules</td><td>Duplicated rules can drift</td></tr><tr><td>Detect an unregistered <code>service_name</code></td><td>Partly</td><td>Match against a list of registered names; anything else counts as unknown</td><td>The list must be updated with the inventory</td></tr><tr><td>Measure Tier 1 coverage</td><td>Partly</td><td>Alloy counts entries processed and written per component, not label coverage</td><td>Measure coverage with queries in Grafana</td></tr><tr><td>Enforce the 15-label Loki limit</td><td><strong>No</strong></td><td>Loki rejects over-limit streams at ingest</td><td>Budget by design (section 5)</td></tr><tr><td>Check that inventory data is correct</td><td><strong>No</strong></td><td>Platform team review</td><td>Manual</td></tr></tbody></table></div>
+<hr>
+<h2 id="12-injection-rules-per-category">12. Injection rules per category <a class="anchor" href="#12-injection-rules-per-category">#</a></h2>
+<blockquote class="review"><strong>Changed in v0.2 — for review.</strong> The configuration in this section is illustrative only. It shows the shape of each rule, has not been run against Alloy, and must not be copied into production as it stands.</blockquote>
 <h3 id="category-1-applications-we-control-on-aws">Category 1 — applications we control, on AWS</h3>
 <p>Set OpenTelemetry resource attributes at the source:</p>
 <pre class="code" data-lang="text">OTEL_RESOURCE_ATTRIBUTES="service.name=checkout-api,\
@@ -207,95 +333,118 @@ service.namespace=shop,\
 deployment.environment.name=production,\
 service.version=1.4.2"</pre>
 <p><strong>Critical gotcha.</strong> OTLP resource attributes do not automatically become labels on every metric series. They populate <code>target_info</code>, and only <code>job</code> and <code>instance</code> are promoted by default. Loki promotes a defined subset of resource attributes to labels, which includes <code>service.name</code>, <code>service.namespace</code> and <code>deployment.environment.name</code> but <strong>not</strong> <code>team</code>, <code>application</code>, <code>tier</code> or <code>source_class</code>.</p>
-<p>Attribution labels must be present on the billed and queried series. Therefore:</p>
-<ul><li>either configure resource-attribute promotion for <code>team</code>, <code>application</code>, <code>tier</code>, <code>source_class</code> on both the metrics and logs paths, and verify on real series</li><li>or inject them in Alloy with <code>prometheus.relabel</code> and <code>loki.relabel</code> from the registry</li></ul>
-<p>The Alloy injection is the reliable path and is consistent with categories 2 to 4. Prefer it, and treat promotion as an optimisation to validate later.</p>
+<p>Tier 1 labels must be present on the billed and queried series. On metrics, that includes <code>service_name</code>, <code>service_namespace</code> and <code>deployment_environment</code> as well as the four custom keys: none of them is on metric series by default. <span class="rv chg">v0.2</span> Therefore:</p>
+<ul><li>either configure resource-attribute promotion for all seven Tier 1 keys on the metrics path, and for the four custom keys on the logs path, and verify on real series <span class="rv chg">v0.2</span></li><li>or inject them in Alloy from the registry: copy the standard keys from the resource attributes, and add the custom keys by matching on <code>service.name</code> <span class="rv chg">v0.2</span></li></ul>
+<p>The Alloy injection is the reliable path and is consistent with categories 2 to 4. Prefer it, and treat promotion as an optimisation to validate later. For traces, see section 9. <span class="rv chg">v0.2</span></p>
 <h3 id="category-2-saas-where-we-are-administrator">Category 2 — SaaS where we are administrator</h3>
 <p>No agent is possible. Ingest what the vendor exposes, and apply every Tier 1 label in the pipeline:</p>
-<pre class="code" data-lang="alloy">loki.relabel "saas_salesforce" {
-  forward_to = [loki.write.cloud.receiver]
+<pre class="code" data-lang="alloy">// Illustrative only: not validated against Alloy.
+loki.relabel "saas_salesforce" {
+  forward_to = [loki.write.production.receiver]
 
-  rule { target_label = "service_name"           replacement = "salesforce-crm" }
-  rule { target_label = "service_namespace"      replacement = "crm" }
-  rule { target_label = "application"            replacement = "crm-platform" }
-  rule { target_label = "team"                   replacement = "sales-systems" }
-  rule { target_label = "tier"                   replacement = "tier1" }
-  rule { target_label = "source_class"           replacement = "saas" }
-  rule { target_label = "deployment_environment" replacement = "production" }
-  rule { target_label = "data_class"             replacement = "confidential" }
+  rule {
+    target_label = "service_name"
+    replacement  = "salesforce-crm"
+  }
+
+  // ...one rule per Tier 1 key, values copied from the inventory entry:
+  // service_namespace=crm  application=crm-platform  team=sales-systems
+  // tier=tier1  source_class=saas  deployment_environment=production
 }</pre>
 <p>Availability and performance for this category are usually best measured with Synthetic Monitoring rather than vendor metrics. Add the same identity as custom check labels, respecting the 10-custom-label cap and the reserved <code>job</code>, <code>instance</code> and <code>probe</code> names.</p>
-<p>Cyber sign-off is required before ingesting any SaaS audit-log export. Redact in the Alloy pipeline, before the write, not at query time.</p>
+<p>Cyber sign-off is required before ingesting any SaaS audit-log export. Redact in the Alloy pipeline with <code>loki.process</code>, before the write, not at query time; <code>loki.relabel</code> cannot read log content. <span class="rv chg">v0.2</span></p>
 <h3 id="category-3-purchased-applications-on-our-ec2">Category 3 — purchased applications on our EC2</h3>
 <p>We control the host and the collector, not the code. Use the vendor integration as published, then add identity:</p>
-<pre class="code" data-lang="alloy">discovery.relabel "cots_billing" {
+<pre class="code" data-lang="alloy">// Illustrative only: not validated against Alloy.
+discovery.relabel "cots_billing" {
   targets = prometheus.exporter.unix.billing.targets
 
-  // Leave the integration's own job value untouched.
-  rule { target_label = "job"          replacement = "integrations/node_exporter" }
-  rule { target_label = "instance"     replacement = constants.hostname }
+  // The integration requires exactly these values. Never set anything else.
+  rule {
+    target_label = "job"
+    replacement  = "integrations/node_exporter"
+  }
+  rule {
+    target_label = "instance"
+    replacement  = constants.hostname
+  }
 
-  // Tier 1 identity from the registry.
-  rule { target_label = "service_name" replacement = "acme-billing" }
-  rule { target_label = "application"  replacement = "finance-billing" }
-  rule { target_label = "team"         replacement = "finance-systems" }
-  rule { target_label = "tier"         replacement = "tier1" }
-  rule { target_label = "source_class" replacement = "hosted-cots" }
+  // ...then one rule per Tier 1 key, values copied from the inventory entry:
+  // service_name=acme-billing  service_namespace=finance  application=finance-billing
+  // team=finance-systems  tier=tier1  source_class=hosted-cots
+  // deployment_environment=production
 }</pre>
+<blockquote class="review"><strong>Changed in v0.2 — for review.</strong> The v0.1 example left out two Tier 1 labels (<code>service_namespace</code> and <code>deployment_environment</code>). Its comment also said "leave the integration's own job value untouched" directly above a rule that sets <code>job</code>. The rule is correct, because the integration needs that exact value; the comment now says so.</blockquote>
 <p>Rules specific to this category:</p>
-<ul><li>Do not override <code>job</code>, <code>server_id</code> or <code>op</code></li><li><code>instance</code> must carry an identical value on metrics and logs for the same target, and Database Observability additionally requires the <code>hostname:port</code> form</li><li>Host metrics on a dedicated host are attributed to that host's <code>service_name</code>; on shared hosts use a platform service such as <code>shared-compute</code> with <code>source_class: other</code></li></ul>
+<ul><li>Do not override <code>job</code>, <code>server_id</code> or <code>op</code> with any value other than the one the integration requires <span class="rv chg">v0.2</span></li><li><code>instance</code> must carry an identical value on metrics and logs for the same target, and Database Observability additionally requires the <code>hostname:port</code> form</li><li>Set the same Tier 1 values in the matching log pipeline; metrics rules do not reach logs <span class="rv chg">v0.2</span></li><li>Host metrics on a dedicated host are attributed to that host's <code>service_name</code>; on shared hosts use a platform service such as <code>shared-compute</code> with <code>source_class: other</code></li><li>Watch the label budget on host logs: the Linux Server integration alone uses 9 labels (section 5) <span class="rv chg">v0.2</span></li></ul>
 <h3 id="category-4-everything-else">Category 4 — everything else</h3>
-<p>The catch-all must never silently drop identity. Apply a default rule last:</p>
-<pre class="code" data-lang="alloy">prometheus.relabel "default_identity" {
-  forward_to = [prometheus.remote_write.cloud.receiver]
+<p>The catch-all must never silently drop identity. Apply a default rule last, on every metrics path and, with <code>loki.relabel</code>, on every logs path: <span class="rv chg">v0.2</span></p>
+<pre class="code" data-lang="alloy">// Illustrative only: not validated against Alloy.
+prometheus.relabel "default_identity" {
+  forward_to = [prometheus.remote_write.production.receiver]
 
-  rule { action = "replace"  target_label = "service_name" replacement = "unknown"
-         source_labels = ["service_name"]  regex = "^$" }
-  rule { action = "replace"  target_label = "team"         replacement = "unassigned"
-         source_labels = ["team"]          regex = "^$" }
-  rule { action = "replace"  target_label = "source_class" replacement = "other"
-         source_labels = ["source_class"]  regex = "^$" }
+  rule {
+    source_labels = ["service_name"]
+    regex         = ""
+    target_label  = "service_name"
+    replacement   = "unknown_service"
+  }
+
+  // ...the same pattern for:  team -&gt; "unassigned"   source_class -&gt; "unknown"
 }</pre>
-<p>Then alert on the volume of <code>service_name="unknown"</code>. An unknown bucket that is measured shrinks; one that is dropped never does.</p>
+<p>Then alert on the volume of <code>service_name="unknown_service"</code>, <code>team="unassigned"</code> and <code>source_class="unknown"</code>. An unknown bucket that is measured shrinks; one that is dropped never does. <span class="rv chg">v0.2</span></p>
 <hr>
-<h2 id="10-correlation-strategy">10. Correlation strategy <a class="anchor" href="#10-correlation-strategy">#</a></h2>
-<div class="tw"><table><thead><tr><th>Hop</th><th>Join key</th><th>Mechanism</th></tr></thead><tbody><tr><td>Metrics to traces</td><td><code>service_name</code> + <code>deployment_environment</code></td><td>Exemplars, span metrics</td></tr><tr><td>Logs to traces</td><td><code>trace_id</code></td><td>Loki structured metadata, never a label</td></tr><tr><td>Application to infrastructure</td><td><code>instance</code>, or <code>k8s.*</code> attributes</td><td>Same <code>instance</code> value on metrics and logs</td></tr><tr><td>Frontend to backend</td><td><code>service_name</code>, <code>service_namespace</code></td><td>Faro app meta maps to <code>service.*</code> resource attributes</td></tr><tr><td>Synthetics to service</td><td><code>service_name</code> as a custom check label</td><td>Filtering and alert routing</td></tr><tr><td>Profiles to service</td><td><code>service_name</code></td><td>Pyroscope tags must match <code>[a-zA-Z_][a-zA-Z0-9_]*</code>; no dots</td></tr><tr><td>Anything to cost</td><td><code>team</code>, <code>application</code></td><td>Cost Management and Billing</td></tr><tr><td>Anything to CMDB</td><td><code>service_name</code> to <code>cmdb_ci</code></td><td>Registry lookup, surfaced as a dashboard link</td></tr></tbody></table></div>
+<h2 id="13-correlation-strategy">13. Correlation strategy <a class="anchor" href="#13-correlation-strategy">#</a></h2>
+<div class="tw"><table><thead><tr><th>Hop</th><th>Join key</th><th>Mechanism</th></tr></thead><tbody><tr><td>Metrics to traces</td><td><code>service_name</code> + <code>deployment_environment</code></td><td>Exemplars, span metrics. Category 1 metrics carry these only once they are copied or promoted (section 12). <span class="rv chg">v0.2</span></td></tr><tr><td>Logs to traces</td><td><code>trace_id</code></td><td>Loki structured metadata, never a label</td></tr><tr><td>Application to infrastructure</td><td><code>instance</code></td><td>Same <code>instance</code> value on metrics and logs</td></tr><tr><td>Frontend to backend</td><td>Trace context (<code>traceparent</code> header)</td><td>Faro propagates trace context to backend calls. The frontend has its own <code>service_name</code>, set from the Faro app name; it does not share the backend's. <span class="rv chg">v0.2</span></td></tr><tr><td>Synthetics to service</td><td><code>service_name</code> as a custom check label</td><td>Filtering and alert routing</td></tr><tr><td>Profiles to service</td><td><code>service_name</code></td><td>Deferred: profiles are not yet in scope (decision 8). Pyroscope tags must match <code>[a-zA-Z_][a-zA-Z0-9_]*</code>; no dots. <span class="rv chg">v0.2</span></td></tr><tr><td>Anything to cost</td><td><code>team</code>, <code>application</code></td><td>Cost Management and Billing</td></tr><tr><td>Anything to CMDB</td><td><code>service_name</code> to <code>cmdb_ci</code></td><td>Registry lookup, surfaced as a dashboard link</td></tr></tbody></table></div>
 <p>The rule to remember: <strong>one identity, many sources.</strong> <code>service_name</code> must hold the identical value whether it originated in an SDK, a relabel rule or a registry lookup.</p>
 <hr>
-<h2 id="11-multi-stack-implications">11. Multi-stack implications <a class="anchor" href="#11-multi-stack-implications">#</a></h2>
+<h2 id="14-multi-stack-implications">14. Multi-stack implications <a class="anchor" href="#14-multi-stack-implications">#</a></h2>
 <p>With separate production and development stacks:</p>
-<ul><li>Cost attribution is configured <strong>per stack</strong>; both need the same two labels registering, and there is no native cross-stack rollup</li><li><code>deployment_environment</code> is still required <em>within</em> each stack, because the development stack will hold more than one environment</li><li>Stack selection becomes a routing decision in Alloy — the same pipeline, a different write endpoint</li><li>Cardinality budgets, limits and dashboards are per stack; a clean development stack tells you nothing about production</li><li>Consider a small meta-monitoring view that reads both stacks for conformance reporting</li></ul>
+<ul><li>Cost attribution is configured <strong>per stack</strong>; both must be configured with the same two labels, and there is no native cross-stack rollup <span class="rv chg">v0.2</span></li><li><code>deployment_environment</code> is still required <em>within</em> each stack, because the development stack will hold more than one environment</li><li>Stack selection becomes a routing decision in Alloy — the same pipeline, a different write endpoint</li><li>Cardinality budgets, limits and dashboards are per stack; a clean development stack tells you nothing about production</li><li>Consider a small meta-monitoring view that reads both stacks for conformance reporting</li></ul>
 <p>Proposed starter enumeration for decision 4, pending confirmation:</p>
 <div class="tw"><table><thead><tr><th><code>deployment_environment</code></th><th>Stack</th></tr></thead><tbody><tr><td><code>production</code></td><td>production</td></tr><tr><td><code>dr</code></td><td>production</td></tr><tr><td><code>staging</code></td><td>development</td></tr><tr><td><code>test</code></td><td>development</td></tr><tr><td><code>development</code></td><td>development</td></tr><tr><td><code>sandbox</code></td><td>development</td></tr></tbody></table></div>
 <hr>
-<h2 id="12-conformance-and-measurement">12. Conformance and measurement <a class="anchor" href="#12-conformance-and-measurement">#</a></h2>
+<h2 id="15-conformance-and-measurement">15. Conformance and measurement <a class="anchor" href="#15-conformance-and-measurement">#</a></h2>
 <p>Conformance is a number we track, not a campaign we run.</p>
-<div class="tw"><table><thead><tr><th>Metric</th><th>Target</th><th>Source</th></tr></thead><tbody><tr><td>Series and streams carrying all Tier 1 labels, by <code>source_class</code></td><td>95%</td><td>Conformance dashboard</td></tr><tr><td>Unattributed cost</td><td>under 5%</td><td>Cost Management</td></tr><tr><td>Registered services with no telemetry in 24h</td><td>0</td><td><code>service_info</code> join</td></tr><tr><td>Telemetry with <code>service_name</code> absent from the registry</td><td>0</td><td>Inverse join</td></tr><tr><td><code>team</code> x <code>application</code> combinations</td><td>under 800</td><td>Section 7 query</td></tr></tbody></table></div>
+<div class="tw"><table><thead><tr><th>Metric</th><th>Target</th><th>Source</th></tr></thead><tbody><tr><td>Series and streams carrying all Tier 1 labels with non-sentinel values, by <code>source_class</code></td><td>95%</td><td>Conformance dashboard <span class="rv chg">v0.2</span></td></tr><tr><td>Unattributed cost</td><td>under 5%</td><td>Cost Management</td></tr><tr><td>Registered services with no telemetry in 24h</td><td>0</td><td><code>service_info</code> join</td></tr><tr><td>Telemetry whose <code>service_name</code> is not in the registry, excluding <code>unknown_service</code></td><td>0</td><td>Inverse join <span class="rv chg">v0.2</span></td></tr><tr><td><code>team</code> x <code>application</code> combinations</td><td>under 800</td><td>Section 7 query, checked against Cost Management <span class="rv chg">v0.2</span></td></tr></tbody></table></div>
 <p>Alerts worth having from day one:</p>
-<ul><li>Volume of <code>service_name="unknown"</code> rising</li><li>Unattributed percentage above 5%</li><li>Conformance for any <code>source_class</code> below 95%</li><li>Attribution combinations above 800</li></ul>
+<ul><li>Volume of <code>service_name="unknown_service"</code>, <code>team="unassigned"</code> or <code>source_class="unknown"</code> rising <span class="rv chg">v0.2</span></li><li>Unattributed percentage above 5%</li><li>Conformance for any <code>source_class</code> below 95%</li><li>Attribution combinations above 800</li></ul>
 <p>Cardinality hygiene, monthly: review the cardinality management dashboards, act on the used/unused split, and run <code>logcli series '{}' --analyze-labels</code> against the busiest tenants.</p>
 <hr>
-<h2 id="13-governance">13. Governance <a class="anchor" href="#13-governance">#</a></h2>
+<h2 id="16-governance">16. Governance <a class="anchor" href="#16-governance">#</a></h2>
 <h3 id="onboarding-gate">Onboarding gate</h3>
 <p>No source is connected until:</p>
-<ol><li>A registry entry exists, with <code>service_name</code> derived from the CMDB CI and <code>application</code> traced to Hopex</li><li><code>application</code> has exactly one owning <code>team</code></li><li><code>tier</code> and <code>data_class</code> are set</li><li><code>source_class</code> is declared</li><li>Cyber has signed off, for category 2 log exports</li><li>The Tier 1 labels are visible on real telemetry in the target stack</li></ol>
+<ol><li>A registry entry exists in the Platform team inventory, with <code>service_name</code> derived from the CMDB CI and <code>application</code> traced to Hopex <span class="rv chg">v0.2</span></li><li><code>application</code> has exactly one owning <code>team</code></li><li><code>tier</code> is set; <code>data_class</code> too, if decision 6 makes it mandatory <span class="rv open">review</span></li><li><code>source_class</code> is declared</li><li>Cyber has signed off, for category 2 log exports</li><li>The Tier 1 labels are visible on real telemetry in the target stack, including metrics for category 1 <span class="rv chg">v0.2</span></li></ol>
+<h3 id="keeping-the-manual-inventory-honest">Keeping the manual inventory honest</h3>
+<blockquote class="review"><strong>Added in v0.2 — for review.</strong> With no generator, three copies of the same facts exist: the inventory, the hand-written Alloy rules, and the <code>service_info</code> file. Reconcile them monthly, and after every onboarding: every inventory entry has matching rules, every rule matches an inventory entry, and <code>service_info</code> matches the inventory. The sentinel alerts in section 15 catch the most common drift, a service with no rule.</blockquote>
 <h3 id="exceptions">Exceptions</h3>
-<p>Any departure from this contract is recorded as an ADR in <code>docs/adr/</code>, stating the constraint, the workaround, the blast radius and a review date. Undocumented exceptions are defects.</p>
+<p>Any departure from this contract is recorded as an ADR in <code>docs/adr/</code> (folder to be created), stating the constraint, the workaround, the blast radius and a review date. Undocumented exceptions are defects. <span class="rv chg">v0.2</span></p>
 <h3 id="versioning-and-review">Versioning and review</h3>
-<p>Semantic versioning. Renaming or removing a Tier 1 key is a major version and needs a migration plan, because it breaks dashboards, alert routing and attribution history simultaneously. Reviewed quarterly, and whenever a new product surface is onboarded.</p>
+<p>Semantic versioning. Renaming or removing a Tier 1 key is a major version and needs a migration plan, because it breaks dashboards, alert routing and attribution history simultaneously. Changing an individual <code>service_name</code> needs the same care (section 4, stability rule). Reviewed quarterly, and whenever a new product surface is onboarded. <span class="rv chg">v0.2</span></p>
 <hr>
-<h2 id="14-anti-patterns">14. Anti-patterns <a class="anchor" href="#14-anti-patterns">#</a></h2>
-<div class="tw"><table><thead><tr><th>Anti-pattern</th><th>Why it hurts</th><th>Instead</th></tr></thead><tbody><tr><td><code>job</code> as the service identity</td><td>Claimed by integrations, prohibited for attribution</td><td><code>service_name</code></td></tr><tr><td>Environment inside the service name</td><td>Doubles the namespace, breaks grouping</td><td><code>deployment_environment</code></td></tr><tr><td><code>pod</code>, <code>container_id</code>, <code>trace_id</code> as labels</td><td>Unbounded, fragments streams</td><td>Structured metadata</td></tr><tr><td>Adding a label "just in case"</td><td>Index growth and fragmentation for nothing</td><td>Add when a query needs it</td></tr><tr><td><code>team</code> declared per service</td><td>Multiplies attribution combinations</td><td>Resolve <code>team</code> from <code>application</code></td></tr><tr><td>Slash in <code>service_name</code></td><td>Breaks Application Observability grouping</td><td><code>service_namespace</code></td></tr><tr><td>Renaming labels per product to look tidy</td><td>Breaks the mixins and dashboards that assume them</td><td>Preserve reserved names</td></tr><tr><td>Dropping unlabelled telemetry</td><td>The gap becomes invisible</td><td>Default to <code>unknown</code> and alert</td></tr><tr><td>CMDB identifiers as labels</td><td>Cardinality with no query value</td><td>Registry fields</td></tr></tbody></table></div>
+<h2 id="17-anti-patterns">17. Anti-patterns <a class="anchor" href="#17-anti-patterns">#</a></h2>
+<div class="tw"><table><thead><tr><th>Anti-pattern</th><th>Why it hurts</th><th>Instead</th></tr></thead><tbody><tr><td><code>job</code> as the service identity</td><td>Claimed by integrations, prohibited for attribution</td><td><code>service_name</code></td></tr><tr><td>Environment inside the service name</td><td>Doubles the namespace, breaks grouping</td><td><code>deployment_environment</code></td></tr><tr><td><code>container_id</code>, <code>trace_id</code> as labels</td><td>Unbounded, fragments streams</td><td>Structured metadata <span class="rv chg">v0.2</span></td></tr><tr><td>Adding a label "just in case"</td><td>Index growth and fragmentation for nothing</td><td>Add when a query needs it</td></tr><tr><td><code>team</code> declared per service</td><td>Multiplies attribution combinations</td><td>Resolve <code>team</code> from <code>application</code></td></tr><tr><td>Slash in <code>service_name</code></td><td>Breaks Application Observability grouping</td><td><code>service_namespace</code></td></tr><tr><td>Renaming labels per product to look tidy</td><td>Breaks the mixins and dashboards that assume them</td><td>Preserve reserved names</td></tr><tr><td>Dropping unlabelled telemetry</td><td>The gap becomes invisible</td><td>Default to the sentinels and alert <span class="rv chg">v0.2</span></td></tr><tr><td>Defaulting to a legitimate value</td><td>Hides the defect the default exists to expose</td><td>Use a sentinel such as <code>unknown</code> <span class="rv chg">v0.2</span></td></tr><tr><td>CMDB identifiers as labels</td><td>Cardinality with no query value</td><td>Registry fields</td></tr><tr><td>Custom trace attributes with an org prefix or <code>service.</code> prefix</td><td>Breaks the single identity across signals</td><td>Bare names (section 9) <span class="rv chg">v0.2</span></td></tr></tbody></table></div>
 <hr>
-<h2 id="15-open-decisions">15. Open decisions <a class="anchor" href="#15-open-decisions">#</a></h2>
-<div class="tw"><table><thead><tr><th>#</th><th>Decision</th><th>Needed by</th><th>Default if unanswered</th></tr></thead><tbody><tr><td>1</td><td>Confirm the <code>deployment_environment</code> enumeration</td><td>v1.0</td><td>Section 11 table</td></tr><tr><td>2</td><td>Confirm <code>application</code> count in Hopex is below 1,000 per stack</td><td>Before enabling attribution</td><td>Verify with section 7 query</td></tr><tr><td>3</td><td>CMDB-to-registry sync: manual PR, scheduled export, or API</td><td>Phase 3</td><td>Manual PR, reviewed</td></tr><tr><td>4</td><td><code>data_class</code> values and whether they drive access control</td><td>Phase 2</td><td>Four values, reporting only</td></tr><tr><td>5</td><td>Owner of the registry repository and its review rota</td><td>Phase 1</td><td>Platform team</td></tr><tr><td>6</td><td>Whether host metrics on shared hosts roll up to a platform service</td><td>Phase 2</td><td><code>shared-compute</code>, <code>source_class: other</code></td></tr></tbody></table></div>
+<h2 id="18-open-decisions">18. Open decisions <a class="anchor" href="#18-open-decisions">#</a></h2>
+<div class="tw"><table><thead><tr><th>#</th><th>Decision</th><th>Needed by</th><th>Default if unanswered</th></tr></thead><tbody><tr><td>1</td><td>Confirm the <code>deployment_environment</code> enumeration</td><td>v1.0</td><td>Section 14 table</td></tr><tr><td>2</td><td>Confirm <code>application</code> count in Hopex is below 1,000 per stack</td><td>Before enabling attribution</td><td>Verify with section 7 query</td></tr><tr><td>3</td><td>CMDB-to-registry sync</td><td>—</td><td><strong>Resolved in v0.2:</strong> manual inventory, Platform team <span class="rv chg">v0.2</span></td></tr><tr><td>4</td><td><code>data_class</code>: mandatory, recommended or dropped; values; whether it drives access control</td><td>Phase 2</td><td>Set where known, do not block onboarding <span class="rv open">review</span></td></tr><tr><td>5</td><td>Owner of the registry</td><td>—</td><td><strong>Resolved in v0.2:</strong> Platform team <span class="rv chg">v0.2</span></td></tr><tr><td>6</td><td>Whether host metrics on shared hosts roll up to a platform service</td><td>Phase 2</td><td><code>shared-compute</code>, <code>source_class: other</code></td></tr><tr><td>7</td><td>Custom trace attributes: bare names or org-prefixed</td><td>Before tracing rollout</td><td>Bare names (section 9) <span class="rv open">review</span></td></tr><tr><td>8</td><td>Policy for log sources over the 15-label budget</td><td>Before category 3 logs</td><td>Keep order in section 5 <span class="rv open">review</span></td></tr><tr><td>9</td><td>How <code>service_info</code> is produced from a manual inventory</td><td>Phase 1</td><td>Static file via textfile collector <span class="rv open">review</span></td></tr><tr><td>10</td><td>Behaviour when attribution combinations pass 1,000 after setup</td><td>Before enabling attribution</td><td>Ask Grafana <span class="rv open">review</span></td></tr><tr><td>11</td><td>Prefix for <code>service_name</code> values starting with a digit</td><td>Before first such service</td><td><code>svc-</code> <span class="rv open">review</span></td></tr><tr><td>12</td><td>Keep or drop <code>provider</code></td><td>v1.0</td><td>Keep <span class="rv open">review</span></td></tr></tbody></table></div>
 <hr>
-<h2 id="16-reference-platform-limits">16. Reference: platform limits <a class="anchor" href="#16-reference-platform-limits">#</a></h2>
+<h2 id="19-reference-platform-limits">19. Reference: platform limits <a class="anchor" href="#19-reference-platform-limits">#</a></h2>
 <p>Constraints that shaped this contract. Verify against current documentation before relying on any single figure.</p>
-<div class="tw"><table><thead><tr><th>Constraint</th><th>Limit</th></tr></thead><tbody><tr><td>Loki index labels per stream</td><td>15</td></tr><tr><td>Loki structured metadata per line</td><td>64 KB, 128 entries</td></tr><tr><td>Loki active streams per tenant, guidance</td><td>under 100,000</td></tr><tr><td>Cost attribution labels</td><td>2</td></tr><tr><td>Cost attribution combinations</td><td>1,000 per stack</td></tr><tr><td>Synthetic Monitoring custom labels</td><td>10 per check, 3 per private probe</td></tr><tr><td>k6 label keys</td><td>100 per org, 30 per project, key under 64 characters</td></tr><tr><td>OpenTelemetry attributes per span, default</td><td>128</td></tr><tr><td>Pyroscope tag format</td><td><code>[a-zA-Z_][a-zA-Z0-9_]*</code>, no dots</td></tr><tr><td>Grafana IRM labels, guidance</td><td>4 to 5 per alert</td></tr></tbody></table></div>
+<div class="tw"><table><thead><tr><th>Constraint</th><th>Limit</th></tr></thead><tbody><tr><td>Loki index labels per stream</td><td>15</td></tr><tr><td>Loki structured metadata per line</td><td>64 KB, 128 entries</td></tr><tr><td>Loki active streams per tenant, guidance</td><td>under 100,000</td></tr><tr><td>Cost attribution labels</td><td>2</td></tr><tr><td>Cost attribution combinations</td><td>1,000 per stack</td></tr><tr><td>Synthetic Monitoring custom labels</td><td>10 per check, 3 per private probe</td></tr><tr><td>k6 label keys</td><td>100 per org, 30 per project, key under 64 characters</td></tr><tr><td>OpenTelemetry attributes per span, default</td><td>128</td></tr><tr><td>Pyroscope tag format (profiles deferred)</td><td><code>[a-zA-Z_][a-zA-Z0-9_]*</code>, no dots <span class="rv chg">v0.2</span></td></tr><tr><td>Grafana IRM labels, guidance</td><td>4 to 5 per alert</td></tr></tbody></table></div>
 <p>Source documentation for every constraint above is catalogued in the <a href="index.html">label management digest</a> that accompanies this repository.</p>
+<hr>
+<h2 id="20-changes-in-v02">20. Changes in v0.2 <a class="anchor" href="#20-changes-in-v02">#</a></h2>
+<blockquote class="review"><strong>Added in v0.2 — for review.</strong> Every change from v0.1, for the reviewer to accept or reject. Items tagged <code>**[review]**</code> in the body need a decision; the rest are corrections.</blockquote>
+<p>Decisions applied from the owner:</p>
+<ul><li>Traces are in scope; section 9 added (decision 7)</li><li>Profiles are not yet in scope (decision 8)</li><li>The registry is a manual inventory maintained by the Platform team; no generator (decision 9)</li><li>Kubernetes is not targeted; <code>cluster</code>, <code>namespace</code> and <code>pod</code> are optional (decision 10)</li><li><code>data_class</code> status is open and marked for review (decision 6, section 5)</li></ul>
+<p>Corrections to v0.1:</p>
+<ul><li>Section 1: the "single enforcement point" claim was false; added the paths that bypass Alloy</li><li>Section 1: "three quarters of the estate" corrected to "three of our four categories"</li><li>Section 4: naming algorithm made deterministic (fixed environment word list, leading-digit prefix, trim after truncate)</li><li>Section 4: stability rule added; a <code>service_name</code> no longer changes when the CMDB name changes</li><li>Section 5: <code>pod</code> moved out of Tier 3; <code>data_class</code> inconsistency surfaced</li><li>Section 5: "Forbidden as label keys" renamed "Restricted keys"</li><li>Section 5: sentinel values added; <code>source_class</code> no longer defaults to the legitimate value <code>other</code>; <code>unknown</code> became <code>unknown_service</code></li><li>Section 5: label budget table added; Linux host logs exceed Loki's 15-label limit</li><li>Section 7: same key strings on every signal; caveat that the combination query measures the inventory, not telemetry</li><li>Section 8: production of <code>service_info</code> from a manual inventory marked open</li><li>Section 12: category 1 metrics also lack <code>service_name</code>, <code>service_namespace</code> and <code>deployment_environment</code> by default</li><li>Section 12: category 3 example completed and its contradictory comment fixed</li><li>Section 12: default rules extended to logs; redaction moved to <code>loki.process</code></li><li>Section 12: all configuration marked illustrative; rule blocks written one attribute per line</li><li>Section 13: frontend-to-backend correlation corrected to trace context propagation</li><li>Section 15: conformance targets adjusted for sentinels</li><li>Section 16: inventory reconciliation added; <code>docs/adr/</code> noted as not yet created</li></ul>
+<p>New in v0.2:</p>
+<ul><li>Section 9, Traces, including the attribute naming for <code>team</code> and <code>application</code></li><li>Section 10, Label lifecycle diagram and per-property table</li><li>Section 11, Pipeline capabilities: what is and is not possible</li><li>Open decisions 7 to 12</li></ul>
+<p>Outside this document:</p>
+<ul><li><code>tools/build-contract.js</code>: review callouts and tags are highlighted in the HTML; contents entries with review items are marked; the date comes from the <strong>Updated</strong> field instead of the build day; a <code>--check</code> mode was added; unsupported Markdown now fails the build; the print layout keeps the title and version</li><li><code>README.md</code>: stale references corrected</li><li><code>.gitignore</code>: <code>.kiro/</code> ignored</li></ul>
     <footer>
-      <p><b>This page is generated.</b> Edit <code>docs/labelling-contract.md</code> and run <code>node tools/build-contract.js</code>. Do not edit <code>contract.html</code> by hand.</p>
+      <p><b>This page is generated.</b> Edit <code>docs/labelling-contract.md</code> and run <code>node tools/build-contract.js</code>; <code>--check</code> reports whether this page is stale. Do not edit <code>contract.html</code> by hand.</p>
       <p>Platform limits quoted here were accurate when written and change between releases. The accompanying <a href="index.html">digest</a> links every underlying Grafana Labs source document.</p>
     </footer>
   </main>

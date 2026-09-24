@@ -21,7 +21,7 @@ xdg-open index.html
 |---|---|
 | The 7 rules | The principles every one of the 35 documents restates. Read this if you read nothing else. |
 | Reading tracks | Four ordered paths with time estimates: fastest useful path (~35 min), rising costs (~45 min), empty dashboards (~30 min), designing a standard (~90 min). |
-| 35 cards | Per document: source link, the conclusion it establishes, and 3–7 concrete actions with the real label names, limits and config snippets inline. |
+| 35 cards | Per document: source link, the conclusion it establishes, a worked example, and 3–7 concrete actions with the real label names, limits and config snippets inline. |
 | Filter bar | Full-text search plus filters for hard requirements (9), read-first (12), Logs (13), Metrics, Traces (7), Profiles (1), Cost (11) and product setup (15). |
 
 Coverage breaks down as 20 best-practice documents (Part 1) and 15 product-specific label requirements (Part 2).
@@ -35,7 +35,7 @@ Nine of the documents describe labels that are **contractual** rather than advis
 - **Kafka integration** — every node in a cluster must share one `kafka_cluster` value, while each carries a unique `instance`.
 - **Kubernetes Monitoring** — pod logs must reach Loki carrying `cluster`, `namespace` and `pod`.
 
-These are filterable via the ⚠ chip on the page.
+These are filterable via the red-dot "Hard requirements" chip on the page.
 
 ## Link corrections
 
@@ -55,15 +55,18 @@ Alongside the digest, this repository holds our own cross-domain labelling and c
 | Format | File | Use |
 |---|---|---|
 | Markdown | [`docs/labelling-contract.md`](docs/labelling-contract.md) | Source of truth, reviewable in pull requests |
-| HTML | [`contract.html`](contract.html) | Reading online, with contents sidebar and print styles |
+| HTML | [`contract.html`](contract.html) | Reading in a browser, with contents sidebar, review highlighting and print styles |
+
+The contract is currently **v0.2, a draft for review**. Every change from v0.1 is marked in place, and section 20 lists them all. In the HTML, yellow marks a change and red marks an open decision.
 
 The HTML is generated. After editing the Markdown:
 
 ```sh
-node tools/build-contract.js
+node tools/build-contract.js           # regenerate contract.html
+node tools/build-contract.js --check   # exit 1 if contract.html is stale
 ```
 
-No dependencies and no install step. The generator supports only the Markdown subset the contract uses and fails loudly rather than emitting wrong HTML.
+No dependencies and no install step. The generator supports only the Markdown subset the contract uses. It fails the build on the constructs it knows it cannot render (indented lines, h5+ headings, images, raw HTML, tables with mismatched cells, unclosed bold), but it is not a full Markdown validator. The date shown in the HTML comes from the **Updated** field in the Markdown, so rebuilding unchanged Markdown produces identical output.
 
 ### The three load-bearing decisions
 
